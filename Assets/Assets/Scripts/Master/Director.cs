@@ -9,96 +9,99 @@ public class Director : MonoBehaviour
   public Material selectMaterial;
   public bool mirror;
   public int seed;
-
   private System.Random rnd;
 
-  void Start()
+  void Start ()
   {
 
-    rnd = new System.Random(seed);
+    rnd = new System.Random (seed);
 
-    board = GameObject.Find("BoardNode").GetComponent<Board>();
+    board = GameObject.Find ("BoardNode").GetComponent<Board> ();
 
     board += "Effect";
     board += "Solid";
     board += "Terrain";
 
-    GameObject cell = Resources.Load<GameObject>("Tokens/Terrain/Cell");
+    GameObject cell = Resources.Load<GameObject> ("Tokens/Terrain/Cell");
 
     Layer terrain = board ["Terrain"];
-    terrain &= (pos => (GameObject)Instantiate(cell));
+    terrain &= (pos => (GameObject)Instantiate (cell));
     
     foreach (Token tkn in terrain) {
       tkn.transform.name = cell.name + " @ " + tkn.pos;
     }
 
-    GameObject tree = Resources.Load<GameObject>("Tokens/Environment/Tree");
-
-    int pct = 10;
-
-    Layer solid = board["Solid"];
+    Layer solid = board ["Solid"];
 
     if (mirror) {
-      Layer dummy = Layer.Dummy(board.xs/2,board.ys);
-      solid &= ((Position pos) => {
-        if ( pos<dummy ) {
-          if(rnd.Next(100) >= pct) return null;
-          GameObject go = (GameObject)Instantiate(tree);
-          go.name = tree.name;
-          return go;
-        } else {
-          Token tkn = solid[solid%pos];
-          if ( tkn == null ) return null;
-          GameObject go = (GameObject)Instantiate(tkn.gameObject);
-          go.name = tree.name;
-          return go;
-        }
-      });
-      Layer.Undummy(dummy);
+      solid &= MirrorObjectInstantiation;
     } else {
-      solid &= (pos => {
-        if(rnd.Next(100) < pct) {
-          GameObject go = (GameObject)Instantiate(tree);
-          go.name = tree.name;
-          return go;
-        } else return null;
-      });
+      solid &= NormalObjectInstantiation;
     }
 
   }
 
-  void Update()
+  private GameObject MirrorObjectInstantiation (Position pos)
   {
+    int mx = (board.xs+1) / 2;
+    int tree_th = 10;
+    int stone_th = 15;
 
-    TestObjectSelection();
+    GameObject tree = Resources.Load<GameObject> ("Tokens/Environment/Tree");
+    GameObject stone = Resources.Load<GameObject> ("Tokens/Environment/Stone");
 
-  }
+    if (pos.x < mx) {
 
-  void TestObjectSelection()
-  {
-    if (Input.GetMouseButtonDown(0)) {
-      Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-      RaycastHit hitInfo;
-      if (Physics.Raycast(ray, out hitInfo)) {
-        if (lastSelected != null) {
-          lastSelected.Unselect();
-        }
-        Token tkn = hitInfo.transform.GetComponent<Token>();
-        if (tkn == null) {
-          lastSelected = null;
-          throw new InvalidOperationException("Selected Object is no Token");
-        } else {
-          lastSelected = board["Terrain"][tkn.pos].Get<Selectable>();
-          if (lastSelected != null) {
-            lastSelected.Select(selectMaterial);
-          }
-        }
-      } else {
-        if (lastSelected != null) {
-          lastSelected.Unselect();
-        }
+      int pct = rnd.Next (100);
+
+      if (pct <= tree_th) {
+        GameObject go = (GameObject)Instantiate (tree);
+        go.name = tree.name;
+        return go;
       }
+      if (pct <= stone_th) {
+        GameObject go = (GameObject)Instantiate (stone);
+        go.name = stone.name;
+        return go;
+      }
+      return (GameObject)null;
+
+    } else { 
+      Layer solid = board ["Solid"];
+      Token tkn = solid [solid % pos];
+      if (tkn == null)
+        return (GameObject)null;
+      GameObject go = (GameObject)Instantiate (tkn.gameObject);
+      go.name = tkn.gameObject.name;
+      return go;
     }
+
   }
+
+  private GameObject NormalObjectInstantiation (Position pos)
+  {
+    int tree_th = 10;
+    int stone_th = 15;
+    
+    GameObject tree = Resources.Load<GameObject> ("Tokens/Environment/Tree");
+    GameObject stone = Resources.Load<GameObject> ("Tokens/Environment/Stone");
+
+    int pct = rnd.Next (100);
+      
+    if (pct <= tree_th) {
+      GameObject go = (GameObject)Instantiate (tree);
+      go.name = tree.name;
+      return go;
+    }
+    if (pct <= stone_th) {
+      GameObject go = (GameObject)Instantiate (stone);
+      go.name = stone.name;
+      return go;
+    }
+    return (GameObject)null;
+      
+  }
+
+
 
 }

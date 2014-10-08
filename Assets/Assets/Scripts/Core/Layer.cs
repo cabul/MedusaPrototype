@@ -98,18 +98,6 @@ public class Layer : MonoBehaviour,IEnumerable
     return list.ToArray();
   }
 
-  public static Layer operator &(Layer lay, Func<Position,Token> init)
-  {
-    Position pos;
-    for (int x = 0; x < lay.xs; x++) {
-      for (int y = 0; y < lay.ys; y++) {
-        pos = new Position(x, y);
-        lay [pos] = init(pos);
-      }
-    }
-    return lay;
-  }
-
   public static Layer operator &(Layer lay, Func<Position,GameObject> init)
   {
     Position pos;
