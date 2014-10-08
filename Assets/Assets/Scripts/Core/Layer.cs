@@ -7,8 +7,15 @@ public class Layer : MonoBehaviour,IEnumerable
 {
 
   private Token[,] map;
-  private int xs;
-  private int ys;
+  public int xs {
+    get;
+    private set;
+  }
+
+  public int ys {
+    get;
+    private set;
+  }
 
   public static Layer Dummy(int xs,int ys)
   {

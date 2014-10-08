@@ -63,11 +63,9 @@ public class Board : MonoBehaviour
         if (tkn == null) {
           throw new InvalidOperationException ("Selected Object is no Token");
         } else {
-          Debug.Log ("Hit @ " + tkn.pos);
           OnClick (tkn);
         }
       } else {
-        Debug.Log ("Hit nothing");
         OnClick (null);
       } 
         
