@@ -37,6 +37,7 @@ public class Director : MonoBehaviour
     env.Generate( solid );
 
     board.OnClick += Selector;
+    board.OnClick += DebugClick;
 
   }
 
