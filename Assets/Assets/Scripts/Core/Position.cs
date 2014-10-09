@@ -17,15 +17,15 @@ public class Position
 
   public static bool operator ==(Position a, Position b)
   {
-    if ((object)a == null) return false;
-    if ((object)b == null) return false;
+    if ((object)a == null) return (object)b == null;
+    if ((object)b == null) return (object)a == null;
     return (a.x == b.x) && (a.y == b.y);
   }
 
   public static bool operator !=(Position a, Position b)
   {
-    if ((object)a == null) return true;
-    if ((object)b == null) return true;
+    if ((object)a == null) return (object)b == null;
+    if ((object)b == null) return (object)a == null;
     return (a.x != b.x) || (a.y != b.y);
   }
 
