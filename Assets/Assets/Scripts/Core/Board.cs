@@ -29,6 +29,17 @@ public class Board : MonoBehaviour
     }
   }
 
+  public Token[] this [Position pos] {
+    get {
+      Token[] tkns = new Token[layer_map.Count];
+      int i = 0;
+      foreach (Layer lay in layer_map.Values) {
+        tkns[i++] = lay[pos];
+      }
+      return tkns;
+    }
+  }
+
   public static Board operator + (Board brd, string str)
   {
     GameObject go = new GameObject (str);
@@ -46,11 +57,6 @@ public class Board : MonoBehaviour
       throw new ArgumentException (str + " not in board");
     Destroy (ch);
     return brd;
-  }
-
-  void Start ()
-  {
-    transform.position = new Vector3 (-xs / 2, 0.75f, -ys / 2);
   }
 
   void Update ()

@@ -5,9 +5,13 @@ using System;
 public class Token : MonoBehaviour
 {
 
+  private Position _pos;
   public Position pos {
-    get;
-    private set;
+    get { return _pos; }
+    set {
+      _pos = value;
+      transform.position = new Vector3(value.x,0,value.y);
+    }
   }
 
   public T[] All<T>() where T : Component
@@ -20,27 +24,9 @@ public class Token : MonoBehaviour
     return transform.GetComponent<T>();
   }
 
-  public static Token operator &(Token tkn, Position pos)
+  public override string ToString ()
   {
-    tkn.pos = pos;
-    return tkn;
-  }
-
-  public static Position operator ~(Token tkn)
-  {
-    Position pos = tkn.pos;
-    tkn.pos = null;
-    return pos;
-  }
-
-  public static bool operator !(Token tkn)
-  {
-    if ((object)tkn.pos == null) {
-      return false;
-    } else {
-      tkn.transform.position = new Vector3(tkn.pos.x, 0, tkn.pos.y);
-      return true;
-    }
+    return transform.name;
   }
 
 }

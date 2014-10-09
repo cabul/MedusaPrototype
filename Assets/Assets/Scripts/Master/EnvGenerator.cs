@@ -24,14 +24,14 @@ public class EnvGenerator : MonoBehaviour
     int mx = (lay.xs + 1) / 2;
 
     if (mirror) {
-      lay &= (pos => {
+      lay.Init(pos => {
         if (pos.x < mx)
           return RandomObject (pos);
         else
           return MirrorObject (pos, lay);
       });
     } else {
-      lay &= RandomObject;
+      lay.Init( RandomObject );
     }
 
   }
