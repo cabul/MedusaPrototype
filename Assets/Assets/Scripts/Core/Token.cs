@@ -10,7 +10,7 @@ public class Token : MonoBehaviour
     get { return _pos; }
     set {
       _pos = value;
-      transform.position = new Vector3(value.x,0,value.y);
+      transform.position = (value==null)?new Vector3(1000,1000,1000):new Vector3(value.x,0,value.y);
     }
   }
 
@@ -26,6 +26,10 @@ public class Token : MonoBehaviour
   public T Get<T>() where T : Component
   {
     return transform.GetComponent<T>();
+  }
+
+  public bool Has<T>() where T : Component {
+    return transform.GetComponent<T>() != null;
   }
 
   public override string ToString ()

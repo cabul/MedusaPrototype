@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public delegate void OnSkillFinish (BaseSkill skill);
+public delegate void OnSkillCancel (BaseSkill skill);
 
 public abstract class BaseSkill : MonoBehaviour
 {
 
-  public event OnSkillFinish OnFinish;
+  public event OnSkillCancel OnCancel;
 
   protected Board board;
   public Token tkn;
@@ -19,17 +19,25 @@ public abstract class BaseSkill : MonoBehaviour
     tkn = GetComponent<Token> ();
   }
 
+  public virtual bool Apply()
+  {
+    return false;
+  }
+
   public virtual void Activate (Board board)
   {
     this.board = board;
   }
 
-  public abstract void Cancel();
-
-  protected void Finish ()
+  public virtual void Cancel()
   {
-    if(OnFinish != null)
-      OnFinish(this);
+
+  }
+
+  protected virtual void Exit ()
+  {
+    if(OnCancel != null)
+      OnCancel(this);
   }
 
 }
