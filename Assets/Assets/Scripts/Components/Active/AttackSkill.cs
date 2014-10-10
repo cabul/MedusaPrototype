@@ -5,6 +5,7 @@ public class AttackSkill : BaseSkill {
 
   public int dmg;
 
+  public Material valid;
   public Material highlight;
   public Material mark;
 
@@ -41,7 +42,7 @@ public class AttackSkill : BaseSkill {
       target = obj;
       terrain[clk.pos].Get<Selectable>().Select(mark); 
     } else {
-      terrain[clk.pos].Get<Selectable>().Select(highlight); 
+      terrain[clk.pos].Get<Selectable>().Select((ValidTarget(solid[clk.pos]))?valid:highlight); 
     }
   }
 
@@ -52,11 +53,13 @@ public class AttackSkill : BaseSkill {
 
     Layer terrain = board["Terrain"];
 
+    Layer solid = board["Solid"];
+
     foreach ( Direction dir in Direction.All ) {
       Position pos = tkn.pos + dir;
       if( pos < terrain ) {
         Selectable cell = terrain[pos].Get<Selectable>();
-        cell.Select(highlight);
+        cell.Select(ValidTarget(solid[pos])?valid:highlight);
       }
     }
   }
@@ -77,15 +80,12 @@ public class AttackSkill : BaseSkill {
   public bool ValidTarget(Token obj) 
   {
     if(obj == null) {
-      Debug.Log("Object doesn't exist");
       return false;
     }
     if(!obj.Has<LifeInfo>()) {
-      Debug.Log("Object doesn't live");
       return false;
     }
     if(obj.Get<LifeInfo>().isDead) {
-      Debug.Log("Object is already dead");
       return false;
     }
     return true;
