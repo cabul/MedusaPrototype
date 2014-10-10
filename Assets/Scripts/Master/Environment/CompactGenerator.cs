@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CompactGenerator : EnvGenerator
-{
 
-  
+// Generacion Compacta
+// aka con menos random
+public class CompactGenerator : EnvGenerator
+{  
   public int treeCount;
   public int stoneCount;
   public int dollCount;

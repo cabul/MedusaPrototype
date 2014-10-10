@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// Controla zoom y rotacion
 public class CameraControl : MonoBehaviour
 {
   private Camera cam;

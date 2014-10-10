@@ -2,6 +2,8 @@
 using System.Collections;
 using System;
 
+// Master of Disaster
+
 public class Director : MonoBehaviour
 {
   private Board board;
@@ -29,12 +31,14 @@ public class Director : MonoBehaviour
 
   void Start ()
   {
+    // Añadir capas
     board += "Effect";
     board += "Solid";
     board += "Terrain";
 
     GameObject cell = Resources.Load<GameObject> ("Tokens/Terrain/Cell");
 
+    // Instanciar el terreno
     Layer terrain = board ["Terrain"];
     terrain.Init (pos => (GameObject)Instantiate (cell));
     
@@ -42,19 +46,25 @@ public class Director : MonoBehaviour
       tkn.transform.name = cell.name + " @ " + tkn.pos;
     }
 
+    // Generar los objetos
+
     Layer solid = board ["Solid"];
 
     EnvGenerator env = board.GetComponent<EnvGenerator> ();
 
     env.Generate (solid);
 
+    // Conectar los eventos
+
     board.OnClick += Selector;
     board.OnClick += DebugClick;
 
+    // Esto creo que ya no hace falta
     nextGUI = Time.time + deltaTime;
 
   }
 
+  // La Interfaz
   void OnGUI()
   {
     if(selectedToken == null) return;
@@ -76,6 +86,7 @@ public class Director : MonoBehaviour
     board.launchClick = true;
   }
 
+  // Seleccionar una habilidad
   private void SelectSkill(BaseSkill skill)
   {
     // Bug fix?
@@ -94,7 +105,8 @@ public class Director : MonoBehaviour
     SkillStart(skill);
   }
 
-
+  // Esto hay que retocarlo un poco
+  // A lo mejor crear una clase que se ocupa de ello
   private void SkillStart (BaseSkill skill)
   {
     Debug.Log("Start skill "+skill.power+ " @ "+Time.time);
@@ -149,6 +161,7 @@ public class Director : MonoBehaviour
     }
   }
 
+  // Seleccionar una celda
   private void Selector (Token tkn)
   {
     UnselectAll();

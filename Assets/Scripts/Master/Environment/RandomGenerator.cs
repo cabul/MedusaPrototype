@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
+// Random a lo loco
 public class RandomGenerator : EnvGenerator
 {
 

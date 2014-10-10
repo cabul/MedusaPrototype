@@ -2,6 +2,9 @@
 using System;
 using System.Collections;
 
+// Representa una Dirección entre dos Posiciones
+
+// No me gustan los Warnings
 #pragma warning disable 659,661
 public sealed class Direction
 {
@@ -45,6 +48,7 @@ public sealed class Direction
     return this == (obj as Direction);
   }
 
+  // Permite operaciones básicas con Direcciones
   public static Direction operator +(Direction a, Direction b)
   {
     return new Direction(a.x + b.x, a.y + b.y);
@@ -55,6 +59,7 @@ public sealed class Direction
     return new Direction(a.x - b.x, a.y - b.y);
   }
 
+  // Multiplicación por un scalar
   public static Direction operator *(Direction d, int s)
   {
     return new Direction(d.x * s, d.y * s);

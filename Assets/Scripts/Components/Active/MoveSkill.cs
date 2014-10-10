@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
+// Habilidad de movimiento
+
 public class MoveSkill : BaseSkill
 {
 

@@ -5,6 +5,7 @@ public abstract class EnvGenerator : MonoBehaviour {
 
   public abstract void Generate(Layer lay);
 
+  // Función de espejo %
   public bool mirror;
 
   public GameObject MirrorObject (Position pos, Layer lay)

@@ -3,6 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+
+// Un layer ... tadaa
+// Mapea de Posición a Token
 public class Layer : MonoBehaviour,IEnumerable
 {
 
@@ -18,6 +21,7 @@ public class Layer : MonoBehaviour,IEnumerable
     private set;
   }
 
+  // Eso se deberia llamar siempre!!
   public void Resize (int xs, int ys)
   {
     this.xs = xs;
@@ -33,13 +37,16 @@ public class Layer : MonoBehaviour,IEnumerable
     return this;
   }
   
+  // Indexa de una posicion a un token
 #pragma warning disable 219
   public Token this [Position pos] {
     get { 
+      // Error si la posicion esta fuera del layer
       if(this<pos) throw new ArgumentOutOfRangeException(pos+" not in layer");
       return map [pos.x, pos.y]; 
     }
     set {
+      // Al poner un token en el layer se actualiza su posicion
       Token old = map [pos.x, pos.y];
       if (old != null) {
         old.pos = null;
@@ -69,6 +76,11 @@ public class Layer : MonoBehaviour,IEnumerable
       || pos.y >= lay.ys;
   }
 
+  // @Dani: Estos dos operadores molan, porque es como en matematicas
+
+  // Para cada x | x < 25
+
+  // Para cada Token done se cumpla test
   public static IEnumerable<Token> operator | (Layer lay, Func<Token,bool> test)
   {
     foreach (Token tkn in lay) {
@@ -78,6 +90,7 @@ public class Layer : MonoBehaviour,IEnumerable
     }
   }
 
+  // Para cada Posicion donde se cumpla test
   public static IEnumerable<Position> operator | (Layer lay, Func<Position,bool> test)
   {
     for (int x = 0, xs = lay.xs; x < xs; x++) {
@@ -90,6 +103,7 @@ public class Layer : MonoBehaviour,IEnumerable
     }
   }
 
+  // Inicializar el layer completo con lo que devuelva init
   public Layer Init (Func<Position,GameObject> init)
   {
     Position pos;
@@ -102,6 +116,7 @@ public class Layer : MonoBehaviour,IEnumerable
     return this;
   }
 
+  // Instanciar un go en el layer
   public Layer Put(GameObject go, Position pos) {
     if (go == null) {
       this [pos] = null;
@@ -115,11 +130,15 @@ public class Layer : MonoBehaviour,IEnumerable
     return this;
   }
   
+  // Este quizas es un poco demasiado
+  // Haze la función de espejo
+  // Por eso %, porque es como un espejo ;)
   public static Position operator % (Layer lay, Position pos)
   {
     return new Position (lay.xs - pos.x - 1, lay.ys - pos.y - 1);
   }
 
+  // Para poder recorrer todos los tokens que no sean null
   public IEnumerator GetEnumerator ()
   {
     List<Token> list = new List<Token> ();
@@ -131,6 +150,7 @@ public class Layer : MonoBehaviour,IEnumerable
     return list.GetEnumerator ();
   }
 
+  // Un rayo a partir de una posicion, en una direccion
   public Position[] Ray (Position pos, Direction dir)
   {
     List<Position> list = new List<Position> ();
@@ -140,11 +160,13 @@ public class Layer : MonoBehaviour,IEnumerable
     return list.ToArray ();
   }
 
+  // Todos los X del indice
   public Position[] ForX (int x)
   {
     return Ray (new Position (x, -1), Direction.Up);
   }
 
+  // Todos los Y del indice
   public Position[] ForY (int y)
   {
     return Ray (new Position (-1, y), Direction.Right);

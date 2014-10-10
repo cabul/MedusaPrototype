@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 
-public class Position
+// Representa una Posición en un Espacio 2D / Tablero
+// Es inmutable
+public sealed class Position
 {
 
   public readonly int x;
@@ -14,6 +16,7 @@ public class Position
     this.y = y;
   }
 
+  // Comparaciones
   public static bool operator ==(Position a, Position b)
   {
     if ((object)a == null) return (object)b == null;
@@ -34,31 +37,42 @@ public class Position
     return this == (obj as Position);
   }
 
+  // Esperemos que no haya tableros más grandes que 100x100 :P
   public override int GetHashCode ()
   {
     return x * 100 + y;
   }
 
+  // Mueve una Posición según una Dirección
+  // Pos = Pos + Dir
   public static Position operator +(Position p, Direction d)
   {
     return new Position(p.x + d.x, p.y + d.y);
   }
 
+  // Calcula la dirección que une a dos posiciones
+  // Dir = Pos - Pos
   public static Direction operator -(Position a, Position b)
   {
     return new Direction(a.x - b.x, a.y - b.y);
   }
 
+  // Comprueba si se encuentra fuera de un layer
+  // Fuera = Pos > Lay
   public static bool operator >(Position pos, Layer lay)
   {
     return lay<pos;
   }
 
+  // Comprueba si se encuentra dentro de un layer
+  // Dentro = Pos < Lay
   public static bool operator <(Position pos, Layer lay)
   {
     return lay>pos;
   }
 
+  // Calcula la distancia entre dos posiciones
+  // Distancia = Pos % Pos
   public static int operator %(Position a, Position b)
   {
     return (a - b).len;

@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// Habilidad de ataque básico
+
 public class AttackSkill : BaseSkill {
 
   public int dmg;

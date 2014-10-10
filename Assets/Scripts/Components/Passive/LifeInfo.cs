@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// Se ocupa de mantener la vida
+
 public class LifeInfo : BaseInfo {
 
   public int maxLife = 20;

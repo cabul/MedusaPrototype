@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+// El OnClickListener
 public delegate void OnClickHandler (Token clicked);
 
 public class Board : MonoBehaviour
@@ -12,8 +13,10 @@ public class Board : MonoBehaviour
   public int ys;
   private Dictionary<string,Layer> layer_map;
 
+  // El evento que se lanza al hacer click
   public event OnClickHandler OnClick;
 
+  // Eso esta falso mientras se interactua con el GUI
   public bool launchClick;
 
   public Board ()
@@ -22,6 +25,7 @@ public class Board : MonoBehaviour
     launchClick = true;
   }
 
+  // Se accede a las capas mediante su nombre
   public Layer this [string name] {
     get {
       if (!layer_map.ContainsKey (name)) {
@@ -32,6 +36,7 @@ public class Board : MonoBehaviour
     }
   }
 
+  // Se accede a todos los tokens en una posicion
   public Token[] this [Position pos] {
     get {
       Token[] tkns = new Token[layer_map.Count];
@@ -43,6 +48,7 @@ public class Board : MonoBehaviour
     }
   }
 
+  // Añadir una capa nueva :)
   public static Board operator + (Board brd, string str)
   {
     GameObject go = new GameObject (str);
@@ -53,6 +59,7 @@ public class Board : MonoBehaviour
     return brd;
   }
 
+  // Quitar una capa, nunca lo he usado
   public static Board operator - (Board brd, string str)
   {
     Transform ch = brd.transform.FindChild (str);
@@ -62,6 +69,7 @@ public class Board : MonoBehaviour
     return brd;
   }
 
+  // Click detection
   void Update ()
   {
     if(launchClick && GUIUtility.hotControl == 0) {
@@ -83,6 +91,7 @@ public class Board : MonoBehaviour
     }
   }
 
+  // Lanzar el evento de forma segura
   private void ClickEvent(Token tkn) {
     if(OnClick != null) {
       OnClick(tkn);
