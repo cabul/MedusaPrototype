@@ -1,15 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BasicSkill : MonoBehaviour {
+public delegate void OnSkillFinish(BasicSkill skill);
 
-	// Use this for initialization
-	void Start () {
+public abstract class BasicSkill : MonoBehaviour {
+
+  public event OnSkillFinish OnFinish;
+
 	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 }

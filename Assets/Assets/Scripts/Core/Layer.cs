@@ -35,7 +35,10 @@ public class Layer : MonoBehaviour,IEnumerable
   
 #pragma warning disable 219
   public Token this [Position pos] {
-    get { return map [pos.x, pos.y]; }
+    get { 
+      if(pos>this) throw new ArgumentOutOfRangeException(pos+" not in layer");
+      return map [pos.x, pos.y]; 
+    }
     set {
       Token old = map [pos.x, pos.y];
       if (old != null) {
@@ -97,21 +100,25 @@ public class Layer : MonoBehaviour,IEnumerable
     for (int x = 0; x < xs; x++) {
       for (int y = 0; y < ys; y++) {
         pos = new Position (x, y);
-        GameObject go = init (pos);
-        if (go == null) {
-          this [pos] = null;
-        } else {
-          Token tkn = go.GetComponent<Token> ();
-          if (tkn == null)
-            throw new ArgumentException (go.name + " must have a Token Component");
-          this [pos] = tkn;
-          tkn.transform.parent = transform;
-        }
+        Put( init (pos), pos);
       }
     }
     return this;
   }
 
+  public Layer Put(GameObject go, Position pos) {
+    if (go == null) {
+      this [pos] = null;
+    } else {
+      Token tkn = go.GetComponent<Token> ();
+      if (tkn == null)
+        throw new ArgumentException (go.name + " must have a Token Component");
+      this [pos] = tkn;
+      tkn.transform.parent = transform;
+    }
+    return this;
+  }
+  
   public static Position operator % (Layer lay, Position pos)
   {
     return new Position (lay.xs - pos.x - 1, lay.ys - pos.y - 1);
