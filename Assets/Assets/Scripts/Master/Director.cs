@@ -5,7 +5,7 @@ using System;
 public class Director : MonoBehaviour
 {
   private Board board;
-  private Token selectedToken;
+  public Token selectedToken;
   public Material selectMaterial;
   public int seed;
 
@@ -14,8 +14,10 @@ public class Director : MonoBehaviour
 
   public int left = 10;
   public int top = 10;
-  public int width = 50;
-  public int height = 50;
+  public int buttonWidth = 50;
+  public int buttonHeight = 50;
+  public int labelWidth = 200;
+  public int labelHeight = 20;
 
   private BaseSkill selectedSkill;
 
@@ -47,59 +49,68 @@ public class Director : MonoBehaviour
     env.Generate (solid);
 
     board.OnClick += Selector;
-    //board.OnClick += DebugClick;
+    board.OnClick += DebugClick;
+
+    nextGUI = Time.time + deltaTime;
 
   }
 
   void OnGUI()
   {
     if(selectedToken == null) return;
+    board.launchClick = false;
+    BaseInfo[] infos = selectedToken.All<BaseInfo>();
+    for(int i = 0; i < infos.Length; i++) {
+      GUI.Label(new Rect(left,top+(labelHeight+top)*i,labelWidth,labelHeight), infos[i].info);
+    }
     BaseSkill[] skills = selectedToken.All<BaseSkill>();
-    if(skills == null) return;
-    
-    for(int i = 0; i < skills.Length; i++) {
-      if(GUI.Button(new Rect(left+((width+left)*i),top,width,height),skills[i].power)) {
-        SelectSkill(skills[i]);
-        return;
+    if(skills != null) {
+      for(int i = 0; i < skills.Length; i++) {
+        if(GUI.Button(new Rect(left+((buttonWidth+left)*i),Screen.height - top - buttonHeight,buttonWidth,buttonHeight),skills[i].power)) {
+          SelectSkill(skills[i]);
+          Event.current.Use();
+          return;
+        }
       }
     }
+    board.launchClick = true;
   }
 
   private void SelectSkill(BaseSkill skill)
   {
+    // Bug fix?
     if( Time.time < nextGUI) return;
     nextGUI = Time.time + deltaTime;
 
     if(selectedSkill == null) {
-      selectedSkill = skill;
       SkillStart(skill);
-    } else {
-      if( selectedSkill == skill ) {
-        SkillConfirm(selectedSkill);
-        selectedSkill = null;
-      } else {
-        SkillStop(selectedSkill);
-        selectedSkill = skill;
-        SkillStart(selectedSkill);
-      }
+      return;
+    } 
+    if( selectedSkill == skill ) {
+      SkillConfirm(skill);
+      return;
     }
+    SkillStop(skill);
+    SkillStart(skill);
   }
 
 
   private void SkillStart (BaseSkill skill)
   {
-    //Debug.Log("Start skill "+skill.power+ " @ "+Time.time);
+    Debug.Log("Start skill "+skill.power+ " @ "+Time.time);
     skill.Activate (board);
 
     board.OnClick -= Selector;
 
     board.OnClick += skill.ClickHandler;
     skill.OnCancel += SkillStop;
+
+    selectedSkill = skill;
   }
 
   private void SkillStop (BaseSkill skill)
   {
-    //Debug.Log("Stop skill "+skill.power+ " @ "+Time.time);
+    Debug.Log("Stop skill "+skill.power+ " @ "+Time.time);
     skill.Cancel();
 
     board.OnClick -= skill.ClickHandler;
@@ -107,15 +118,16 @@ public class Director : MonoBehaviour
     
     board.OnClick += Selector;
 
-    UnSelectAll();
+    selectedSkill = null;
 
-    Selector(selectedToken);
+    UnselectAll();
+    SelectAt(selectedToken.pos);
 
   }
 
   private void SkillConfirm (BaseSkill skill)
   {
-    //Debug.Log("Confirm skill "+skill.power+ " @ "+Time.time);
+    Debug.Log("Confirm skill "+skill.power+ " @ "+Time.time);
     skill.Apply();
 
     board.OnClick -= skill.ClickHandler;
@@ -123,13 +135,14 @@ public class Director : MonoBehaviour
     
     board.OnClick += Selector;
 
-    UnSelectAll();
+    selectedSkill = null;
 
-    Selector(selectedToken);
+    UnselectAll();
+    SelectAt(selectedToken.pos);
 
   }
 
-  private void UnSelectAll()
+  private void UnselectAll()
   {
     foreach(Token tkn in board["Terrain"]) {
       tkn.Get<Selectable>().Unselect();
@@ -138,13 +151,21 @@ public class Director : MonoBehaviour
 
   private void Selector (Token tkn)
   {
-    if (selectedToken != null) {
-      board["Terrain"][selectedToken.pos].Get<Selectable>().Unselect();
-    }
+    UnselectAll();
     if (tkn != null) {
       selectedToken = board["Solid"][tkn.pos];
-      board["Terrain"][tkn.pos].Get<Selectable>().Select (selectMaterial);
+      SelectAt(tkn.pos);
     }
+  }
+
+  private void UnselectAt(Position pos)
+  {
+    board["Terrain"][pos].Get<Selectable>().Unselect();
+  }
+
+  private void SelectAt(Position pos)
+  {
+    board["Terrain"][pos].Get<Selectable>().Select (selectMaterial);
   }
 
   private void DebugClick (Token tkn)

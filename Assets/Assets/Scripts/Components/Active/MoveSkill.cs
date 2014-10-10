@@ -21,15 +21,18 @@ public class MoveSkill : BaseSkill
   public override void ClickHandler (Token clk)
   {
     if (clk == null) {
+      Debug.Log("Nothing clicked");
       Exit ();
       return;
     }
     if (!valid.Contains (clk.pos)) {
+      Debug.Log("Not valid clicked");
       Exit ();
       return;
     }
 
     if(clk.pos == tkn.pos) {
+      Debug.Log("Already clicked");
       Exit ();
       return;
     }
@@ -89,14 +92,13 @@ public class MoveSkill : BaseSkill
       valid.Add(pos);
     }
 
-    Debug.Log(valid.Count);
+    valid.Remove(tkn.pos);
 
     Layer terrain = board ["Terrain"];
 
     foreach (Position pos in valid) {
       Selectable select = terrain [pos].Get<Selectable> ();
       if (select != null) {
-        Debug.Log("Selecting "+pos);
         select.Select (highlight);
       }
     }

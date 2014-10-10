@@ -17,6 +17,11 @@ public class AttackSkill : BaseSkill {
 
   public override void ClickHandler (Token clk)
   {
+    if(clk == null) {
+      ClearSelection();
+      Exit();
+      return;
+    }
     if(clk.pos % tkn.pos != 1) {
       ClearSelection();
       Exit();
@@ -35,6 +40,8 @@ public class AttackSkill : BaseSkill {
     if(ValidTarget(obj)) {
       target = obj;
       terrain[clk.pos].Get<Selectable>().Select(mark); 
+    } else {
+      terrain[clk.pos].Get<Selectable>().Select(highlight); 
     }
   }
 
@@ -58,7 +65,7 @@ public class AttackSkill : BaseSkill {
   {
     ClearSelection();
     if(target == null) return false;
-    target.Get<Life>().Damage(dmg);
+    target.Get<LifeInfo>().Damage(dmg);
     return true;
   }
 
@@ -69,7 +76,19 @@ public class AttackSkill : BaseSkill {
 
   public bool ValidTarget(Token obj) 
   {
-    return obj.Has<Life>() && !obj.Get<Life>().isDead;
+    if(obj == null) {
+      Debug.Log("Object doesn't exist");
+      return false;
+    }
+    if(!obj.Has<LifeInfo>()) {
+      Debug.Log("Object doesn't live");
+      return false;
+    }
+    if(obj.Get<LifeInfo>().isDead) {
+      Debug.Log("Object is already dead");
+      return false;
+    }
+    return true;
   }
 
   private void ClearSelection()
