@@ -5,20 +5,33 @@ public class Selectable : MonoBehaviour
 {
 
   private Material normal;
+  private Material current;
+  private Renderer ren;
 
   void Start()
   {
-    normal = transform.GetChild(0).renderer.material;
+    ren = transform.GetChild(0).renderer;
+    normal = ren.material;
+    current = normal;
   }
 
-  public void Select(Material select)
+  public Material Select(Material select)
   {
-    transform.GetChild(0).renderer.material = select;
+    current = select;
+    return normal;
   }
 
-  public void Unselect()
+  public Material Unselect()
   {
-    transform.GetChild(0).renderer.material = normal;
+    Material old = current;
+    current = normal;
+    return old;
+  }
+
+  void Update()
+  {
+    // Esto aqui es horrible!
+    ren.material = current;
   }
 
 }

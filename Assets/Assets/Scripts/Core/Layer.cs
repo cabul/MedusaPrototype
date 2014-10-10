@@ -36,7 +36,7 @@ public class Layer : MonoBehaviour,IEnumerable
 #pragma warning disable 219
   public Token this [Position pos] {
     get { 
-      if(pos>this) throw new ArgumentOutOfRangeException(pos+" not in layer");
+      if(this<pos) throw new ArgumentOutOfRangeException(pos+" not in layer");
       return map [pos.x, pos.y]; 
     }
     set {
@@ -55,43 +55,39 @@ public class Layer : MonoBehaviour,IEnumerable
   public static bool operator > (Layer lay, Position pos)
   {
     return pos.x >= 0
-      && pos.x < lay.xs
-      && pos.y >= 0
-      && pos.y < lay.ys;
+        && pos.x < lay.xs
+        && pos.y >= 0
+        && pos.y < lay.ys;
   }
 
   // Outside of bounds
   public static bool operator < (Layer lay, Position pos)
   {
     return pos.x < 0
-      && pos.x >= lay.xs
-      && pos.y < 0
-      && pos.y >= lay.ys;
+      || pos.x >= lay.xs
+      || pos.y < 0
+      || pos.y >= lay.ys;
   }
 
-  public static Token[] operator | (Layer lay, Func<Token,bool> test)
+  public static IEnumerable<Token> operator | (Layer lay, Func<Token,bool> test)
   {
-    List<Token> list = new List<Token> ();
     foreach (Token tkn in lay) {
       if (test (tkn)) {
-        list.Add (tkn);
+        yield return tkn;
       }
     }
-    return list.ToArray ();
   }
 
-  public static Position[] operator | (Layer lay, Func<Position,bool> test)
+  public static IEnumerable<Position> operator | (Layer lay, Func<Position,bool> test)
   {
-    List<Position> list = new List<Position> ();
     for (int x = 0, xs = lay.xs; x < xs; x++) {
       for (int y = 0, ys = lay.ys; y < ys; y++) {
         Position pos = new Position (x, y);
         if (test (pos)) {
-          list.Add (pos);
+          yield return pos;
         }
       }
     }
-    return list.ToArray ();
   }
 
   public Layer Init (Func<Position,GameObject> init)

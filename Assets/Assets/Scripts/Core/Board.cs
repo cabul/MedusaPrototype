@@ -14,9 +14,12 @@ public class Board : MonoBehaviour
 
   public event OnClickHandler OnClick;
 
+  public bool launchClick;
+
   public Board ()
   {
     layer_map = new Dictionary<string,Layer > ();
+    launchClick = true;
   }
 
   public Layer this [string name] {
@@ -61,21 +64,28 @@ public class Board : MonoBehaviour
 
   void Update ()
   {
-    if (Input.GetMouseButtonDown (0)) {
-      Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-      RaycastHit hitInfo;
-      if (Physics.Raycast (ray, out hitInfo)) {
-        Token tkn = hitInfo.transform.GetComponent<Token> ();
-        if (tkn == null) {
-          throw new InvalidOperationException ("Selected Object is no Token");
+    if(launchClick && GUIUtility.hotControl == 0) {
+      if (Input.GetMouseButtonDown (0)) {
+        Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+        RaycastHit hitInfo;
+        if (Physics.Raycast (ray, out hitInfo)) {
+          Token tkn = hitInfo.transform.GetComponent<Token> ();
+          if (tkn == null) {
+            throw new InvalidOperationException ("Selected Object is no Token");
+          } else {
+            ClickEvent(tkn);
+          }
         } else {
-          OnClick (tkn);
-        }
-      } else {
-        OnClick (null);
-      } 
-        
+          ClickEvent(null);
+        } 
+          
+      }
+    }
+  }
 
+  private void ClickEvent(Token tkn) {
+    if(OnClick != null) {
+      OnClick(tkn);
     }
   }
 
