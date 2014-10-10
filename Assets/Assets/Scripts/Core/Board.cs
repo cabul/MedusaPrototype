@@ -69,13 +69,19 @@ public class Board : MonoBehaviour
         if (tkn == null) {
           throw new InvalidOperationException ("Selected Object is no Token");
         } else {
-          OnClick (tkn);
+          ClickEvent(tkn);
         }
       } else {
-        OnClick (null);
+        ClickEvent(null);
       } 
         
 
+    }
+  }
+
+  private void ClickEvent(Token tkn) {
+    if(OnClick != null) {
+      OnClick(tkn);
     }
   }
 

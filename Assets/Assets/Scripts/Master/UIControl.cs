@@ -25,11 +25,12 @@ public class UIControl : MonoBehaviour {
     {
       for(int i = 0; i < skills.Length; i++) {
         BaseSkill skill = skills[i];
-        if(GUI.Button(new Rect(left+((width+left)*i),top,width,height),skill.power)) {
+        if(GUI.Button(new Rect(left+((width+left)*i),top,width,height),skill.power) && OnSkill != null) {
           OnSkill(skill);
         }
       }
     }
   }
+
 
 }

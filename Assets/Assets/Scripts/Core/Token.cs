@@ -14,6 +14,10 @@ public class Token : MonoBehaviour
     }
   }
 
+  public Layer layer {
+    get { return transform.parent.GetComponent<Layer>(); }
+  }
+
   public T[] All<T>() where T : Component
   {
     return transform.GetComponents<T>();

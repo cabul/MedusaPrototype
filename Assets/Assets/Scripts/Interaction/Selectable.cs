@@ -11,14 +11,17 @@ public class Selectable : MonoBehaviour
     normal = transform.GetChild(0).renderer.material;
   }
 
-  public void Select(Material select)
+  public Material Select(Material select)
   {
     transform.GetChild(0).renderer.material = select;
+    return normal;
   }
 
-  public void Unselect()
+  public Material Unselect()
   {
+    Material old = transform.GetChild(0).renderer.material;
     transform.GetChild(0).renderer.material = normal;
+    return old;
   }
 
 }

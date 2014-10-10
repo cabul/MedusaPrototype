@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 
-#pragma warning disable 659,661
 public class Position
 {
 
@@ -33,6 +32,11 @@ public class Position
   {
     if( obj == null ) return false;
     return this == (obj as Position);
+  }
+
+  public override int GetHashCode ()
+  {
+    return x * 100 + y;
   }
 
   public static Position operator +(Position p, Direction d)
