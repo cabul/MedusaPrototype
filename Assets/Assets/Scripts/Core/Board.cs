@@ -61,7 +61,7 @@ public class Board : MonoBehaviour
 
   void Update ()
   {
-    if (Input.GetMouseButtonDown (0)) {
+    if (Input.GetMouseButtonDown (0) && GUIUtility.hotControl == 0) {
       Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
       RaycastHit hitInfo;
       if (Physics.Raycast (ray, out hitInfo)) {
@@ -69,13 +69,19 @@ public class Board : MonoBehaviour
         if (tkn == null) {
           throw new InvalidOperationException ("Selected Object is no Token");
         } else {
-          OnClick (tkn);
+          ClickEvent(tkn);
         }
       } else {
-        OnClick (null);
+        ClickEvent(null);
       } 
         
 
+    }
+  }
+
+  private void ClickEvent(Token tkn) {
+    if(OnClick != null) {
+      OnClick(tkn);
     }
   }
 
