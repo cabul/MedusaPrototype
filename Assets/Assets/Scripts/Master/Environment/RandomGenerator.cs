@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EnvGenerator : MonoBehaviour
+public class RandomGenerator : EnvGenerator
 {
 
   private float tree_th = 0.1f;
@@ -9,7 +9,6 @@ public class EnvGenerator : MonoBehaviour
   private GameObject tree;
   private GameObject stone;
   private Layer solid;
-  public bool mirror;
 
   void Awake ()
   {
@@ -19,7 +18,7 @@ public class EnvGenerator : MonoBehaviour
 
   }
 
-  public void Generate (Layer lay)
+  public override void Generate (Layer lay)
   {
     int mx = (lay.xs + 1) / 2;
 
@@ -52,14 +51,4 @@ public class EnvGenerator : MonoBehaviour
     return null;
   }
 
-  private GameObject MirrorObject (Position pos, Layer lay)
-  {
-    Token tkn = lay [lay % pos];
-    if (tkn == null)
-      return (GameObject)null;
-    GameObject go = (GameObject)Instantiate (tkn.gameObject);
-    go.name = tkn.gameObject.name;
-    return go;
-  }
-  
 }

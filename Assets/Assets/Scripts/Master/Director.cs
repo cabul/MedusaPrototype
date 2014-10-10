@@ -5,9 +5,8 @@ using System;
 public class Director : MonoBehaviour
 {
   private Board board;
-  public Selectable lastSelected;
+  private Selectable lastSelected;
   public Material selectMaterial;
-  public bool mirror;
   public int seed;
 
   private GameObject doll;
@@ -40,10 +39,9 @@ public class Director : MonoBehaviour
 
     env.Generate( solid );
 
-    board.OnClick += PlaceDoll;
+    board.OnClick += Selector;
     board.OnClick += DebugClick;
 
-    Debug.Log ("Place doll");
 
   }
 
