@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-#pragma warning disable 660,661
+#pragma warning disable 659,661
 public sealed class Direction
 {
 
@@ -11,6 +11,8 @@ public sealed class Direction
   public static readonly Direction Right = Left * -1;
   public static readonly Direction Up = new Direction(0, 1);
   public static readonly Direction Down = Up * -1;
+
+  public static readonly Direction[] All = {Up,Right,Down,Left};
 
   public Direction(int x, int y)
   {
@@ -34,6 +36,12 @@ public sealed class Direction
     if ((object)a == null) return (object)b == null;
     if ((object)b == null) return (object)a == null;
     return a.x != b.x || a.y != b.y;
+  }
+
+  public override bool Equals (object obj)
+  {
+    if( obj == null ) return false;
+    return this == (obj as Direction);
   }
 
   public static Direction operator +(Direction a, Direction b)

@@ -61,7 +61,7 @@ public class Board : MonoBehaviour
 
   void Update ()
   {
-    if (Input.GetMouseButtonDown (0)) {
+    if (Input.GetMouseButtonDown (0) && GUIUtility.hotControl == 0) {
       Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
       RaycastHit hitInfo;
       if (Physics.Raycast (ray, out hitInfo)) {
