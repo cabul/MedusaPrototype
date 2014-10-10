@@ -22,39 +22,36 @@ public class MoveSkill : BaseSkill
   public override void ClickHandler (Token clk)
   {
     if (clk == null) {
-      FinishMove ();
+      Cancel ();
+      Finish ();
       return;
     }
     if (!valid.Contains (clk.pos)) {
-      FinishMove ();
+      Cancel ();
+      Finish ();
+      return;
+    }
+
+    if(clk.pos == tkn.pos) {
+      Cancel ();
+      Finish ();
       return;
     }
 
     if (clk.pos == current) {
-      Material select = board ["Terrain"] [me.pos].Get<Selectable>().Unselect();
-      me.layer [current] = me;
+      Material select = board ["Terrain"] [tkn.pos].Get<Selectable>().Unselect();
+      tkn.layer [current] = tkn;
       valid.Remove(current);
-      board ["Terrain"] [me.pos].Get<Selectable>().Select(select);
-      FinishMove ();
+      board ["Terrain"] [tkn.pos].Get<Selectable>().Select(select);
+      Cancel ();
+      Finish ();
     }
 
-    if (clk.pos % current == 1 && !steps.Contains (clk.pos)) {
+    if (clk.pos % current == 1 && !steps.Contains (clk.pos) && steps.Count < range) {
       steps.Add (clk.pos);
       board ["Terrain"] [clk.pos].Get<Selectable> ().Select (mark);
       current = clk.pos;
     }
-  }
-
-  public void FinishMove ()
-  {
-    Layer terrain = board ["Terrain"];
-    foreach (Position pos in valid) {
-      Selectable select = terrain [pos].Get<Selectable> ();
-      if (select != null) {
-        select.Unselect ();
-      }
-    }
-    Finish ();
   }
 
   public override void Activate (Board board)
@@ -64,9 +61,9 @@ public class MoveSkill : BaseSkill
     valid.Clear ();
     steps.Clear ();
 
-    current = me.pos;
+    current = tkn.pos;
 
-    SearchWay (valid, board ["Solid"], me.pos, range);
+    SearchWay (valid, board ["Solid"], tkn.pos, range);
 
     Layer terrain = board ["Terrain"];
 
@@ -79,6 +76,17 @@ public class MoveSkill : BaseSkill
 
   }
 
+  public override void Cancel ()
+  {
+    Layer terrain = board ["Terrain"];
+    foreach (Position pos in valid) {
+      Selectable select = terrain [pos].Get<Selectable> ();
+      if (select != null) {
+        select.Unselect ();
+      }
+    }
+  }
+
   public void SearchWay (HashSet<Position> cells, Layer lay, Position init, int max)
   {
     if (max-- == 0)
@@ -89,7 +97,7 @@ public class MoveSkill : BaseSkill
       if (pos > lay)
         continue;
       if (lay [pos] == null) {
-        if (pos != me.pos && cells.Add (pos)) {
+        if (pos != tkn.pos && cells.Add (pos)) {
           SearchWay (cells, lay, pos, max);
         }
       }

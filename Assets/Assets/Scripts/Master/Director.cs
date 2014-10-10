@@ -41,7 +41,7 @@ public class Director : MonoBehaviour
     board.OnClick += Selector;
     //board.OnClick += DebugClick;
 
-    ui.OnSkill += SkillStart;
+    ui.OnSelect += SkillStart;
 
   }
 
@@ -50,7 +50,8 @@ public class Director : MonoBehaviour
     board.OnClick -= Selector;
     board.OnClick += skill.ClickHandler;
     skill.OnFinish += SkillStop;
-    ui.OnSkill -= SkillStart;
+    ui.OnSelect -= SkillStart;
+    ui.OnCancel += SkillStop;
     skill.Activate (board);
   }
 
@@ -59,7 +60,9 @@ public class Director : MonoBehaviour
     board.OnClick += Selector;
     board.OnClick -= skill.ClickHandler;
     skill.OnFinish -= SkillStop;
-    ui.OnSkill += SkillStart;
+    ui.OnSelect += SkillStart;
+    ui.OnCancel -= SkillStop;
+    skill.Cancel();
   }
 
   private void Selector (Token tkn)

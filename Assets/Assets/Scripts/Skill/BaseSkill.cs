@@ -9,20 +9,22 @@ public abstract class BaseSkill : MonoBehaviour
   public event OnSkillFinish OnFinish;
 
   protected Board board;
-  protected Token me;
+  public Token tkn;
   public string power;
 
   public abstract void ClickHandler (Token clk);
 
   void Awake ()
   {
-    me = GetComponent<Token> ();
+    tkn = GetComponent<Token> ();
   }
 
   public virtual void Activate (Board board)
   {
     this.board = board;
   }
+
+  public abstract void Cancel();
 
   protected void Finish ()
   {

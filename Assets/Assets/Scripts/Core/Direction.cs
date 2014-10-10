@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 
 #pragma warning disable 659,661
@@ -21,7 +22,7 @@ public sealed class Direction
   }
 
   public int len {
-    get { return x + y; }
+    get { return Math.Abs(x) + Math.Abs(y); }
   }
 
   public static bool operator ==(Direction a, Direction b)
