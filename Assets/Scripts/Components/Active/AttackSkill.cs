@@ -59,7 +59,7 @@ public class AttackSkill : BaseSkill {
 
     foreach ( Direction dir in Direction.All ) {
       Position pos = tkn.pos + dir;
-      if( pos < terrain ) {
+      if( pos.Inside(terrain) ) {
         Selectable cell = terrain[pos].Get<Selectable>();
         cell.Select(ValidTarget(solid[pos])?valid:highlight);
       }
@@ -98,7 +98,7 @@ public class AttackSkill : BaseSkill {
     Layer terrain = board["Terrain"];
     foreach(Direction dir in Direction.All ) {
       Position pos = tkn.pos + dir;
-      if(pos<terrain) {
+      if(pos.Inside(terrain)) {
         terrain[pos].Get<Selectable>().Unselect();
       }
     }

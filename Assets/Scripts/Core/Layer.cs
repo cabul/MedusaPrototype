@@ -42,7 +42,7 @@ public class Layer : MonoBehaviour,IEnumerable
   public Token this [Position pos] {
     get { 
       // Error si la posicion esta fuera del layer
-      if(this<pos) throw new ArgumentOutOfRangeException(pos+" not in layer");
+      if(Outside(pos)) throw new ArgumentOutOfRangeException(pos+" not in layer");
       return map [pos.x, pos.y]; 
     }
     set {
@@ -59,21 +59,21 @@ public class Layer : MonoBehaviour,IEnumerable
   }
 
   // Inside of bounds
-  public static bool operator > (Layer lay, Position pos)
+  public bool Inside (Position pos)
   {
     return pos.x >= 0
-        && pos.x < lay.xs
+        && pos.x < xs
         && pos.y >= 0
-        && pos.y < lay.ys;
+        && pos.y < ys;
   }
 
   // Outside of bounds
-  public static bool operator < (Layer lay, Position pos)
+  public bool Outside (Position pos)
   {
     return pos.x < 0
-      || pos.x >= lay.xs
+      || pos.x >= xs
       || pos.y < 0
-      || pos.y >= lay.ys;
+      || pos.y >= ys;
   }
 
   // @Dani: Estos dos operadores molan, porque es como en matematicas
@@ -154,7 +154,7 @@ public class Layer : MonoBehaviour,IEnumerable
   public Position[] Ray (Position pos, Direction dir)
   {
     List<Position> list = new List<Position> ();
-    while (this>(pos+=dir)) {
+    while (Inside(pos+=dir)) {
       list.Add (pos);
     }
     return list.ToArray ();

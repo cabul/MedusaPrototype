@@ -59,16 +59,16 @@ public sealed class Position
 
   // Comprueba si se encuentra fuera de un layer
   // Fuera = Pos > Lay
-  public static bool operator >(Position pos, Layer lay)
+  public bool Outside(Layer lay)
   {
-    return lay<pos;
+    return lay.Outside(this);
   }
 
   // Comprueba si se encuentra dentro de un layer
   // Dentro = Pos < Lay
-  public static bool operator <(Position pos, Layer lay)
+  public bool Inside(Layer lay)
   {
-    return lay>pos;
+    return lay.Inside(this);
   }
 
   // Calcula la distancia entre dos posiciones

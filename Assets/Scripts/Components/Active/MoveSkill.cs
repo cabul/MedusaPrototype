@@ -119,7 +119,7 @@ public class MoveSkill : BaseSkill
     Position pos;
     foreach (Direction dir in Direction.All) {
       pos = init + dir;
-      if (pos > lay)
+      if (pos.Outside(lay))
         continue;
       if (lay [pos] == null) {
         cells.Add (pos);
