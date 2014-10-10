@@ -16,6 +16,9 @@ public class CameraControl : MonoBehaviour
   private float rotInertia = 2;
   private float rotDelta;
 
+  private float keyDx;
+  private float keySens = 2;
+
   public bool doRotate;
   public bool doZoom;
 
@@ -56,13 +59,33 @@ public class CameraControl : MonoBehaviour
       isRotating = false;
     }
 
+    float dx;
+
     if (isRotating) {
-      float dx = (Input.mousePosition.x - mousePosition.x) * rotSens;
-      rotDelta = Mathf.Lerp(rotDelta,rotDelta+dx,Time.deltaTime *rotInertia);
+      dx = (Input.mousePosition.x - mousePosition.x) * rotSens;
       mousePosition = Input.mousePosition;
     } else {
-      rotDelta = Mathf.Lerp(rotDelta,0,Time.deltaTime*rotInertia);
+      dx = - rotDelta;
     }
+
+    if(Input.GetKeyDown(KeyCode.LeftArrow)) {
+      keyDx = -1;
+    }
+    if(Input.GetKeyDown(KeyCode.RightArrow)) {
+      keyDx = 1;
+    }
+
+    if(Input.GetKeyUp(KeyCode.LeftArrow)) {
+      keyDx = 0;
+    }
+    if(Input.GetKeyUp(KeyCode.RightArrow)) {
+      keyDx = 0;
+    }
+
+    dx += keyDx * keySens;
+
+
+    rotDelta = Mathf.Lerp(rotDelta,rotDelta+dx,Time.deltaTime *rotInertia);
 
     rotation += rotDelta;
     transform.eulerAngles = new Vector3 (30, rotation, 0);
