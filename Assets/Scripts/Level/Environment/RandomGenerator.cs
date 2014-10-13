@@ -1,56 +1,60 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-
-// Random a lo loco
 public class RandomGenerator : EnvGenerator
-{
-
-  private float tree_th = 0.1f;
-  private float stone_th = 0.15f;
+{  
+  public int treeCount;
+  public int stoneCount;
+  public int dollCount;
   private GameObject tree;
   private GameObject stone;
-  private Layer solid;
+  private GameObject doll;
 
   void Awake ()
   {
-    
     tree = Resources.Load<GameObject> ("Tokens/Environment/Tree");
     stone = Resources.Load<GameObject> ("Tokens/Environment/Stone");
-
+    doll = Resources.Load<GameObject> ("Tokens/Character/Doll");
   }
 
-  public override void Generate (Layer lay)
+  public override void Generate(Layer lay)
   {
-    int mx = (lay.xs + 1) / 2;
-
-    if (mirror) {
-      lay.Init(pos => {
-        if (pos.x < mx)
-          return RandomObject (pos);
-        else
-          return MirrorObject (pos, lay);
-      });
-    } else {
-      lay.Init( RandomObject );
-    }
-
+    SetRandom(tree,lay,treeCount);
+    SetRandom(stone,lay,stoneCount);
+    SetRandom(doll,lay,dollCount);
   }
 
-  private GameObject RandomObject (Position pos)
+  private void SetRandom(GameObject org,Layer lay,int cnt)
   {
-    float pct = Random.value;
-    if (pct <= tree_th) {
-      GameObject go = (GameObject)Instantiate (tree);
-      go.name = tree.name;
-      return go;
+    int xMax = (mirror)?(lay.xs+1)/2:lay.xs;
+    int yMax = lay.ys;
+
+    Position pos;
+
+    while(cnt > 0) {
+      pos = RandomPosition(xMax,yMax);
+      if(lay[pos] == null) {
+        lay.Put(CloneGO(org),pos);
+        cnt-=1;
+        if(mirror) {
+          lay.Put(CloneGO(org),lay.Mirror(pos));
+          cnt-=1;
+        }
+      }
     }
-    if (pct <= stone_th) {
-      GameObject go = (GameObject)Instantiate (stone);
-      go.name = stone.name;
-      return go;
-    }
-    return null;
+
   }
 
+  private GameObject CloneGO(GameObject org)
+  {
+    GameObject go = (GameObject)Instantiate(org);
+    go.name = org.name;
+    return go;
+  }
+
+  private Position RandomPosition (int xMax, int yMax)
+  {
+    return new Position ((int)(Random.value * xMax), (int)(Random.value * yMax));
+  }
+  
 }
