@@ -9,8 +9,8 @@ public delegate void OnClickHandler (Token clicked);
 public class Board : MonoBehaviour
 {
 
-  public int xs;
-  public int ys;
+  public int width;
+  public int height;
   private Dictionary<string,Layer> layer_map;
 
   // El evento que se lanza al hacer click
@@ -37,36 +37,26 @@ public class Board : MonoBehaviour
   }
 
   // Se accede a todos los tokens en una posicion
-  public Token[] this [Position pos] {
+  public Token[] this [Position position] {
     get {
-      Token[] tkns = new Token[layer_map.Count];
+      Token[] tokens = new Token[layer_map.Count];
       int i = 0;
-      foreach (Layer lay in layer_map.Values) {
-        tkns[i++] = lay[pos];
+      foreach (Layer layer in layer_map.Values) {
+        tokens[i++] = layer[position];
       }
-      return tkns;
+      return tokens;
     }
   }
 
   // Añadir una capa nueva :)
-  public static Board operator + (Board brd, string str)
+  public static Board operator + (Board board, string name)
   {
-    GameObject go = new GameObject (str);
-    Layer lay = go.AddComponent<Layer> ();
-    go.transform.parent = brd.transform;
-    lay.Resize (brd.xs, brd.ys);
-    brd.layer_map.Add (str, lay);
-    return brd;
-  }
-
-  // Quitar una capa, nunca lo he usado
-  public static Board operator - (Board brd, string str)
-  {
-    Transform ch = brd.transform.FindChild (str);
-    if (ch == null)
-      throw new ArgumentException (str + " not in board");
-    Destroy (ch);
-    return brd;
+    GameObject go = new GameObject (name);
+    Layer layer = go.AddComponent<Layer> ();
+    go.transform.parent = board.transform;
+    layer.SetSize (board.width, board.height);
+    board.layer_map.Add (name, layer);
+    return board;
   }
 
   // Click detection
@@ -77,11 +67,11 @@ public class Board : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
         RaycastHit hitInfo;
         if (Physics.Raycast (ray, out hitInfo)) {
-          Token tkn = hitInfo.transform.GetComponent<Token> ();
-          if (tkn == null) {
+          Token token = hitInfo.transform.GetComponent<Token> ();
+          if (token == null) {
             throw new InvalidOperationException ("Selected Object is no Token");
           } else {
-            ClickEvent(tkn);
+            ClickEvent(token);
           }
         } else {
           ClickEvent(null);
@@ -92,9 +82,9 @@ public class Board : MonoBehaviour
   }
 
   // Lanzar el evento de forma segura
-  private void ClickEvent(Token tkn) {
+  private void ClickEvent(Token token) {
     if(OnClick != null) {
-      OnClick(tkn);
+      OnClick(token);
     }
   }
 

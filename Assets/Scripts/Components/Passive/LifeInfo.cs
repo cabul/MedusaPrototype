@@ -5,13 +5,13 @@ using System.Collections;
 
 public class LifeInfo : BaseInfo {
 
-  public int maxLife = 20;
+  public int maximumLife = 20;
   public int currentLife = 20;
 
   protected override string GetInfo()
   {
     if(isDead) return "K.O.";
-    return "HP: "+currentLife+"/"+maxLife;
+    return "HP: "+currentLife+"/"+maximumLife;
   }
 
   public bool isDead {
@@ -25,10 +25,16 @@ public class LifeInfo : BaseInfo {
     if(currentLife <= 0) {
       Debug.Log ( gameObject.name + " dies");
       currentLife = 0;
+      OnDeath();
       return true;
     }
 
     return false;
+  }
+
+  protected virtual void OnDeath()
+  {
+
   }
 
 }

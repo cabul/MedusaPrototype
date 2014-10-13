@@ -27,36 +27,36 @@ public class MoveSkill : BaseSkill
       Exit ();
       return;
     }
-    if (!valid.Contains (clk.pos)) {
+    if (!valid.Contains (clk.position)) {
       Debug.Log("Not valid clicked");
       Exit ();
       return;
     }
 
-    if(clk.pos == tkn.pos) {
+    if(clk.position == tkn.position) {
       Debug.Log("Already clicked");
       Exit ();
       return;
     }
 
     if(steps.Count == 0) {
-      if(clk.pos.Distance(tkn.pos) == 1 && steps.Count < range) {
-        steps.AddLast(clk.pos);
-        board ["Terrain"] [clk.pos].Get<Selectable> ().Select (mark);
+      if(clk.position.Distance(tkn.position) == 1 && steps.Count < range) {
+        steps.AddLast(clk.position);
+        board ["Terrain"] [clk.position].Get<Selectable> ().Select (mark);
       }
       return;
     }
 
-    if(clk.pos == steps.Last.Value) {
-      board ["Terrain"] [clk.pos].Get<Selectable> ().Unselect();
-      board ["Terrain"] [clk.pos].Get<Selectable> ().Select (highlight);
+    if(clk.position == steps.Last.Value) {
+      board ["Terrain"] [clk.position].Get<Selectable> ().Unselect();
+      board ["Terrain"] [clk.position].Get<Selectable> ().Select (highlight);
       steps.RemoveLast();
       return;
     }
 
-    if (clk.pos.Distance(steps.Last.Value) == 1 && !steps.Contains (clk.pos) && steps.Count < range) {
-      steps.AddLast(clk.pos);
-      board ["Terrain"] [clk.pos].Get<Selectable> ().Select (mark);
+    if (clk.position.Distance(steps.Last.Value) == 1 && !steps.Contains (clk.position) && steps.Count < range) {
+      steps.AddLast(clk.position);
+      board ["Terrain"] [clk.position].Get<Selectable> ().Select (mark);
     }
   }
 
@@ -72,7 +72,7 @@ public class MoveSkill : BaseSkill
       ClearSelection();
       return false;
     }
-    tkn.layer[tkn.pos] = null;
+    tkn.layer[tkn.position] = null;
     tkn.layer[steps.Last.Value] = tkn;
     ClearSelection();
     return true;
@@ -85,14 +85,14 @@ public class MoveSkill : BaseSkill
     valid.Clear ();
     steps.Clear ();
 
-    SearchWay (valid, board ["Solid"], tkn.pos, range);
+    SearchWay (valid, board ["Solid"], tkn.position, range);
     
-    valid.Remove(tkn.pos);
+    valid.Remove(tkn.position);
 
     Layer terrain = board ["Terrain"];
 
-    foreach (Position pos in valid) {
-      Selectable select = terrain [pos].Get<Selectable> ();
+    foreach (Position position in valid) {
+      Selectable select = terrain [position].Get<Selectable> ();
       if (select != null) {
         select.Select (highlight);
       }
@@ -109,14 +109,14 @@ public class MoveSkill : BaseSkill
   {
     if (max-- == 0)
       return;
-    Position pos;
+    Position position;
     foreach (Direction dir in Direction.All) {
-      pos = init + dir;
-      if (pos.Outside(lay))
+      position = init + dir;
+      if (position.Outside(lay))
         continue;
-      if (lay [pos] == null) {
-        cells.Add (pos);
-        SearchWay (cells, lay, pos, max);
+      if (lay [position] == null) {
+        cells.Add (position);
+        SearchWay (cells, lay, position, max);
       }
     }
   }
@@ -124,8 +124,8 @@ public class MoveSkill : BaseSkill
   private void ClearSelection()
   {
     Layer terrain = board ["Terrain"];
-    foreach (Position pos in valid) {
-      Selectable sable = terrain [pos].Get<Selectable> ();
+    foreach (Position position in valid) {
+      Selectable sable = terrain [position].Get<Selectable> ();
       if (sable != null) {
         sable.Unselect ();
       }

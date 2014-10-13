@@ -52,9 +52,9 @@ public class Director : MonoBehaviour
   {
     GameObject cell = Resources.Load<GameObject> ("Tokens/Terrain/Cell");
     Layer terrain = board ["Terrain"];
-    terrain.Init (pos => (GameObject)Instantiate (cell));
-    foreach (Token tkn in terrain) {
-      tkn.transform.name = cell.name + " @ " + tkn.pos;
+    terrain.Init (position => (GameObject)Instantiate (cell));
+    foreach (Token token in terrain) {
+      token.transform.name = cell.name + " @ " + token.position;
     }
   }
 
@@ -78,15 +78,16 @@ public class Director : MonoBehaviour
     board.launchClick = true;
   }
 
-  private void ShowLabels(Token tkn)
+  private void ShowLabels(Token token)
   {
-    BaseInfo[] infos = tkn.All<BaseInfo>();
+    BaseInfo[] infos = token.All<BaseInfo>();
     for(int i = 0; i < infos.Length; i++) {
-      GUI.Label(new Rect(left,top+(labelHeight+top)*i,labelWidth,labelHeight), infos[i].info);
+      GUI.Label(new Rect(left,top+(labelHeight+top)*i,labelWidth,labelHeight), infos[i].Content);
     }
   }
 
-  private bool ShowSkills(Token tkn)
+  // returns true if skill was selected
+  private bool ShowSkills(Token token)
   {
     BaseSkill[] skills = selectedToken.All<BaseSkill>();
     if(skills != null) {
@@ -133,7 +134,7 @@ public class Director : MonoBehaviour
     HandleEvents(skill);
 
     UnselectAll();
-    SelectAt(selectedToken.pos);
+    SelectAt(selectedToken.position);
 
   }
 
@@ -145,7 +146,7 @@ public class Director : MonoBehaviour
     HandleEvents(skill);
 
     UnselectAll();
-    SelectAt(selectedToken.pos);
+    SelectAt(selectedToken.position);
 
   }
 
@@ -167,42 +168,42 @@ public class Director : MonoBehaviour
 
   private void UnselectAll()
   {
-    foreach(Token tkn in board["Terrain"]) {
-      tkn.Get<Selectable>().Unselect();
+    foreach(Token token in board["Terrain"]) {
+      token.Get<Selectable>().Unselect();
     }
   }
 
   // Seleccionar una celda
-  private void Selector (Token tkn)
+  private void Selector (Token token)
   {
     UnselectAll();
-    if (tkn != null) {
-      selectedToken = board["Solid"][tkn.pos];
-      SelectAt(tkn.pos);
+    if (token != null) {
+      selectedToken = board["Solid"][token.position];
+      SelectAt(token.position);
     }
   }
 
-  private void UnselectAt(Position pos)
+  private void UnselectAt(Position position)
   {
-    board["Terrain"][pos].Get<Selectable>().Unselect();
+    board["Terrain"][position].Get<Selectable>().Unselect();
   }
 
-  private void SelectAt(Position pos)
+  private void SelectAt(Position position)
   {
-    board["Terrain"][pos].Get<Selectable>().Select (selectMaterial);
+    board["Terrain"][position].Get<Selectable>().Select (selectMaterial);
   }
 
-  private void DebugClick (Token tkn)
+  private void DebugClick (Token token)
   {
-    if (tkn == null) {
+    if (token == null) {
       Debug.Log ("Hit Nothing");
     } else {
-      Token[] tkns = board [tkn.pos];
-      string[] arr = new string[tkns.Length];
-      for (int i = 0; i < tkns.Length; i++) {
-        arr [i] = (tkns [i] == null) ? "ø" : tkns [i].gameObject.name;
+      Token[] tokens = board [token.position];
+      string[] arr = new string[tokens.Length];
+      for (int i = 0; i < tokens.Length; i++) {
+        arr [i] = (tokens [i] == null) ? "ø" : tokens [i].gameObject.name;
       }
-      Debug.Log ("Hit @ " + tkn.pos + ": [ " + string.Join (", ", arr) + " ]");
+      Debug.Log ("Hit @ " + token.position + ": [ " + string.Join (", ", arr) + " ]");
     }
   }
 

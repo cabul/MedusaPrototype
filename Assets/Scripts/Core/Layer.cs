@@ -11,69 +11,70 @@ public class Layer : MonoBehaviour,IEnumerable
 
   private Token[,] map;
 
-  public int xs {
+  public int width {
     get;
     private set;
   }
 
-  public int ys {
+  public int height {
     get;
     private set;
   }
 
   // Eso se deberia llamar siempre!!
-  public void Resize (int xs, int ys)
+  public void SetSize (int width, int height)
   {
-    this.xs = xs;
-    this.ys = ys;
-    map = new Token[xs, ys];
+    this.width = width;
+    this.height = height;
+    map = new Token[width, height];
   }
 
   public Layer Clear()
   {
-    foreach (Token tkn in this) {
-      this [tkn.pos] = null;
+    foreach (Token token in this) {
+      this [token.position] = null;
     }
     return this;
   }
   
   // Indexa de una posicion a un token
-#pragma warning disable 219
-  public Token this [Position pos] {
+  public Token this [Position position] {
     get { 
       // Error si la posicion esta fuera del layer
-      if(Outside(pos)) throw new ArgumentOutOfRangeException(pos+" not in layer");
-      return map [pos.x, pos.y]; 
+      if(Outside(position)) throw new ArgumentOutOfRangeException(position+" not in layer");
+      return map [position.x, position.y]; 
     }
     set {
       // Al poner un token en el layer se actualiza su posicion
-      Token old = map [pos.x, pos.y];
+      Token old = map [position.x, position.y];
       if (old != null) {
-        old.pos = null;
+        old.position = null;
+        old.Place();
       } 
       if (value != null) {
-        value.pos = pos;
+        value.position = position;
+        value.Place();
       }
-      map [pos.x, pos.y] = value;
+      map [position.x, position.y] = value;
     }
   }
 
   // Inside of bounds
-  public bool Inside (Position pos)
+  public bool Inside (Position position)
   {
-    return pos.x >= 0
-        && pos.x < xs
-        && pos.y >= 0
-        && pos.y < ys;
+    return position.x >= 0
+        && position.x < width
+        && position.y >= 0
+        && position.y < height;
   }
 
   // Outside of bounds
-  public bool Outside (Position pos)
+  public bool Outside (Position position)
   {
-    return pos.x < 0
-      || pos.x >= xs
-      || pos.y < 0
-      || pos.y >= ys;
+    return position.x < 0
+        || position.x >= width
+        || position.y < 0
+        || position.y >= height;
   }
 
   // @Dani: Estos dos operadores molan, porque es como en matematicas
@@ -83,9 +84,9 @@ public class Layer : MonoBehaviour,IEnumerable
   // Para cada Token done se cumpla test
   public static IEnumerable<Token> operator | (Layer lay, Func<Token,bool> test)
   {
-    foreach (Token tkn in lay) {
-      if (test (tkn)) {
-        yield return tkn;
+    foreach (Token token in lay) {
+      if (test (token)) {
+        yield return token;
       }
     }
   }
@@ -93,11 +94,11 @@ public class Layer : MonoBehaviour,IEnumerable
   // Para cada Posicion donde se cumpla test
   public static IEnumerable<Position> operator | (Layer lay, Func<Position,bool> test)
   {
-    for (int x = 0, xs = lay.xs; x < xs; x++) {
-      for (int y = 0, ys = lay.ys; y < ys; y++) {
-        Position pos = new Position (x, y);
-        if (test (pos)) {
-          yield return pos;
+    for (int x = 0, width = lay.width; x < width; x++) {
+      for (int y = 0, height = lay.height; y < height; y++) {
+        Position position = new Position (x, y);
+        if (test (position)) {
+          yield return position;
         }
       }
     }
@@ -106,53 +107,53 @@ public class Layer : MonoBehaviour,IEnumerable
   // Inicializar el layer completo con lo que devuelva init
   public Layer Init (Func<Position,GameObject> init)
   {
-    Position pos;
-    for (int x = 0; x < xs; x++) {
-      for (int y = 0; y < ys; y++) {
-        pos = new Position (x, y);
-        Put( init (pos), pos);
+    Position position;
+    for (int x = 0; x < width; x++) {
+      for (int y = 0; y < height; y++) {
+        position = new Position (x, y);
+        Put( init (position), position);
       }
     }
     return this;
   }
 
   // Instanciar un go en el layer
-  public Layer Put(GameObject go, Position pos) {
+  public Layer Put(GameObject go, Position position) {
     if (go == null) {
-      this [pos] = null;
+      this [position] = null;
     } else {
-      Token tkn = go.GetComponent<Token> ();
-      if (tkn == null)
+      Token token = go.GetComponent<Token> ();
+      if (token == null)
         throw new ArgumentException (go.name + " must have a Token Component");
-      this [pos] = tkn;
-      tkn.transform.parent = transform;
+      this [position] = token;
+      token.transform.parent = transform;
     }
     return this;
   }
   
-  public Position Mirror(Position pos)
+  public Position Mirror(Position position)
   {
-    return new Position (xs - pos.x - 1, ys - pos.y - 1);
+    return new Position (width - position.x - 1, height - position.y - 1);
   }
 
   // Para poder recorrer todos los tokens que no sean null
   public IEnumerator GetEnumerator ()
   {
     List<Token> list = new List<Token> ();
-    foreach (Token tkn in map) {
-      if (tkn != null) {
-        list.Add (tkn);
+    foreach (Token token in map) {
+      if (token != null) {
+        list.Add (token);
       }
     }
     return list.GetEnumerator ();
   }
 
   // Un rayo a partir de una posicion, en una direccion
-  public Position[] Ray (Position pos, Direction dir)
+  public Position[] Ray (Position position, Direction direction)
   {
     List<Position> list = new List<Position> ();
-    while (Inside(pos+=dir)) {
-      list.Add (pos);
+    while (Inside(position+=direction)) {
+      list.Add (position);
     }
     return list.ToArray ();
   }

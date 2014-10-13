@@ -5,7 +5,7 @@ using System.Collections;
 
 public abstract class BaseInfo : MonoBehaviour{
 
-	public string info{
+	public string Content{
     get{ return GetInfo(); }
   }
 

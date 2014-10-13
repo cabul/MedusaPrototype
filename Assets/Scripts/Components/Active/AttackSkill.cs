@@ -25,29 +25,28 @@ public class AttackSkill : BaseSkill {
       Exit();
       return;
     }
-    if(clk.pos.Distance(tkn.pos) != 1) {
+    if(clk.position.Distance(tkn.position) != 1) {
       ClearSelection();
       Exit();
       return;
     }
     Layer solid = board["Solid"];
-    Token obj = solid[clk.pos];
+    Token obj = solid[clk.position];
     
     Layer terrain = board["Terrain"];
 
     if (obj != target) {
       target = null;
-      terrain[clk.pos].Get<Selectable>().Unselect();
+      terrain[clk.position].Get<Selectable>().Unselect();
     }
 
     if(ValidTarget(obj)) {
       target = obj;
-      terrain[clk.pos].Get<Selectable>().Select(mark); 
+      terrain[clk.position].Get<Selectable>().Select(mark); 
     } else {
-      terrain[clk.pos].Get<Selectable>().Select((ValidTarget(solid[clk.pos]))?valid:highlight); 
+      terrain[clk.position].Get<Selectable>().Select((ValidTarget(solid[clk.position]))?valid:highlight); 
     }
   }
-
 
   public override void Activate (Board board)
   {
@@ -58,10 +57,10 @@ public class AttackSkill : BaseSkill {
     Layer solid = board["Solid"];
 
     foreach ( Direction dir in Direction.All ) {
-      Position pos = tkn.pos + dir;
-      if( pos.Inside(terrain) ) {
-        Selectable cell = terrain[pos].Get<Selectable>();
-        cell.Select(ValidTarget(solid[pos])?valid:highlight);
+      Position position = tkn.position + dir;
+      if( position.Inside(terrain) ) {
+        Selectable cell = terrain[position].Get<Selectable>();
+        cell.Select(ValidTarget(solid[position])?valid:highlight);
       }
     }
   }
@@ -97,9 +96,9 @@ public class AttackSkill : BaseSkill {
   {
     Layer terrain = board["Terrain"];
     foreach(Direction dir in Direction.All ) {
-      Position pos = tkn.pos + dir;
-      if(pos.Inside(terrain)) {
-        terrain[pos].Get<Selectable>().Unselect();
+      Position position = tkn.position + dir;
+      if(position.Inside(terrain)) {
+        terrain[position].Get<Selectable>().Unselect();
       }
     }
   }

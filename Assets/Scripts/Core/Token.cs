@@ -8,14 +8,12 @@ using System;
 public class Token : MonoBehaviour
 {
 
-  private Position _pos;
-  public Position pos {
-    get { return _pos; }
-    set {
-      _pos = value;
-      // V(1000,1000,1000) lo quita de la vista, sin tener que eliminarlo
-      transform.position = (value==null)?new Vector3(1000,1000,1000):new Vector3(value.x,0,value.y);
-    }
+  public Position position;
+  
+
+  public void Place()
+  {
+    transform.position = (position==null)?new Vector3(1000,1000,1000):new Vector3(position.x,0,position.y);
   }
 
   // Wrappers para acceder al padre
