@@ -40,7 +40,7 @@ public class MoveSkill : BaseSkill
     }
 
     if(steps.Count == 0) {
-      if(clk.pos % tkn.pos == 1 && steps.Count < range) {
+      if(clk.pos.Distance(tkn.pos) == 1 && steps.Count < range) {
         steps.AddLast(clk.pos);
         board ["Terrain"] [clk.pos].Get<Selectable> ().Select (mark);
       }
@@ -54,7 +54,7 @@ public class MoveSkill : BaseSkill
       return;
     }
 
-    if (clk.pos % steps.Last.Value == 1 && !steps.Contains (clk.pos) && steps.Count < range) {
+    if (clk.pos.Distance(steps.Last.Value) == 1 && !steps.Contains (clk.pos) && steps.Count < range) {
       steps.AddLast(clk.pos);
       board ["Terrain"] [clk.pos].Get<Selectable> ().Select (mark);
     }
@@ -85,15 +85,8 @@ public class MoveSkill : BaseSkill
     valid.Clear ();
     steps.Clear ();
 
-    List<Position> cells = new List<Position>();
-
-    SearchWay (cells, board ["Solid"], tkn.pos, range);
+    SearchWay (valid, board ["Solid"], tkn.pos, range);
     
-    foreach(Position pos in cells)
-    {
-      valid.Add(pos);
-    }
-
     valid.Remove(tkn.pos);
 
     Layer terrain = board ["Terrain"];
@@ -112,7 +105,7 @@ public class MoveSkill : BaseSkill
     ClearSelection();
   }
 
-  public void SearchWay (List<Position> cells, Layer lay, Position init, int max)
+  public void SearchWay (HashSet<Position> cells, Layer lay, Position init, int max)
   {
     if (max-- == 0)
       return;

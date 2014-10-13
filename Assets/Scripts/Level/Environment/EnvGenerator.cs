@@ -5,12 +5,11 @@ public abstract class EnvGenerator : MonoBehaviour {
 
   public abstract void Generate(Layer lay);
 
-  // Función de espejo %
   public bool mirror;
 
   public GameObject MirrorObject (Position pos, Layer lay)
   {
-    Token tkn = lay [lay % pos];
+    Token tkn = lay [lay.Mirror(pos)];
     if (tkn == null)
       return (GameObject)null;
     GameObject go = (GameObject)Instantiate (tkn.gameObject);

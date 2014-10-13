@@ -25,7 +25,7 @@ public class AttackSkill : BaseSkill {
       Exit();
       return;
     }
-    if(clk.pos % tkn.pos != 1) {
+    if(clk.pos.Distance(tkn.pos) != 1) {
       ClearSelection();
       Exit();
       return;

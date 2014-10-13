@@ -2,8 +2,6 @@
 using System.Collections;
 using System;
 
-// Master of Disaster
-
 public class Director : MonoBehaviour
 {
   private Board board;
@@ -11,9 +9,8 @@ public class Director : MonoBehaviour
   public Material selectMaterial;
   public int seed;
 
-  public float nextGUI = 0;
-  public float deltaTime = 0.01f;
 
+  // GUI Stuff
   public int left = 10;
   public int top = 10;
   public int buttonWidth = 50;
@@ -31,37 +28,41 @@ public class Director : MonoBehaviour
 
   void Start ()
   {
-    // Añadir capas
-    board += "Effect";
-    board += "Solid";
-    board += "Terrain";
+    CreateLayers();
 
-    GameObject cell = Resources.Load<GameObject> ("Tokens/Terrain/Cell");
+    CreateTerrain();
 
-    // Instanciar el terreno
-    Layer terrain = board ["Terrain"];
-    terrain.Init (pos => (GameObject)Instantiate (cell));
-    
-    foreach (Token tkn in terrain) {
-      tkn.transform.name = cell.name + " @ " + tkn.pos;
-    }
-
-    // Generar los objetos
-
-    Layer solid = board ["Solid"];
-
-    EnvGenerator env = board.GetComponent<EnvGenerator> ();
-
-    env.Generate (solid);
+    PopulateBoard();
 
     // Conectar los eventos
 
     board.OnClick += Selector;
     board.OnClick += DebugClick;
 
-    // Esto creo que ya no hace falta
-    nextGUI = Time.time + deltaTime;
+  }
 
+  private void CreateLayers() 
+  {
+    board += "Effect";
+    board += "Solid";
+    board += "Terrain";
+  }
+
+  private void CreateTerrain()
+  {
+    GameObject cell = Resources.Load<GameObject> ("Tokens/Terrain/Cell");
+    Layer terrain = board ["Terrain"];
+    terrain.Init (pos => (GameObject)Instantiate (cell));
+    foreach (Token tkn in terrain) {
+      tkn.transform.name = cell.name + " @ " + tkn.pos;
+    }
+  }
+
+  private void PopulateBoard()
+  {
+    Layer solid = board ["Solid"];
+    EnvGenerator env = board.GetComponent<EnvGenerator> ();
+    env.Generate (solid);
   }
 
   // La Interfaz
@@ -69,30 +70,40 @@ public class Director : MonoBehaviour
   {
     if(selectedToken == null) return;
     board.launchClick = false;
-    BaseInfo[] infos = selectedToken.All<BaseInfo>();
+
+    ShowLabels(selectedToken);
+
+    if( ShowSkills(selectedToken) ) return;
+
+    board.launchClick = true;
+  }
+
+  private void ShowLabels(Token tkn)
+  {
+    BaseInfo[] infos = tkn.All<BaseInfo>();
     for(int i = 0; i < infos.Length; i++) {
       GUI.Label(new Rect(left,top+(labelHeight+top)*i,labelWidth,labelHeight), infos[i].info);
     }
+  }
+
+  private bool ShowSkills(Token tkn)
+  {
     BaseSkill[] skills = selectedToken.All<BaseSkill>();
     if(skills != null) {
       for(int i = 0; i < skills.Length; i++) {
         if(GUI.Button(new Rect(left+((buttonWidth+left)*i),Screen.height - top - buttonHeight,buttonWidth,buttonHeight),skills[i].power)) {
           SelectSkill(skills[i]);
           Event.current.Use();
-          return;
+          return true;
         }
       }
     }
-    board.launchClick = true;
+    return false;
   }
 
   // Seleccionar una habilidad
   private void SelectSkill(BaseSkill skill)
   {
-    // Bug fix?
-    if( Time.time < nextGUI) return;
-    nextGUI = Time.time + deltaTime;
-
     if(selectedSkill == null) {
       SkillStart(skill);
       return;
@@ -111,13 +122,7 @@ public class Director : MonoBehaviour
   {
     Debug.Log("Start skill "+skill.power+ " @ "+Time.time);
     skill.Activate (board);
-
-    board.OnClick -= Selector;
-
-    board.OnClick += skill.ClickHandler;
-    skill.OnCancel += SkillStop;
-
-    selectedSkill = skill;
+    PropagateEvents(skill);
   }
 
   private void SkillStop (BaseSkill skill)
@@ -125,12 +130,7 @@ public class Director : MonoBehaviour
     Debug.Log("Stop skill "+skill.power+ " @ "+Time.time);
     skill.Cancel();
 
-    board.OnClick -= skill.ClickHandler;
-    skill.OnCancel -= SkillStop;
-    
-    board.OnClick += Selector;
-
-    selectedSkill = null;
+    HandleEvents(skill);
 
     UnselectAll();
     SelectAt(selectedToken.pos);
@@ -142,16 +142,27 @@ public class Director : MonoBehaviour
     Debug.Log("Confirm skill "+skill.power+ " @ "+Time.time);
     skill.Apply();
 
-    board.OnClick -= skill.ClickHandler;
-    skill.OnCancel -= SkillStop;
-    
-    board.OnClick += Selector;
-
-    selectedSkill = null;
+    HandleEvents(skill);
 
     UnselectAll();
     SelectAt(selectedToken.pos);
 
+  }
+
+  private void PropagateEvents(BaseSkill skill)
+  {
+    board.OnClick -= Selector;
+    board.OnClick += skill.ClickHandler;
+    skill.OnCancel += SkillStop;
+    selectedSkill = skill;
+  }
+
+  private void HandleEvents(BaseSkill skill)
+  {
+    board.OnClick -= skill.ClickHandler;
+    skill.OnCancel -= SkillStop;
+    board.OnClick += Selector;
+    selectedSkill = null;
   }
 
   private void UnselectAll()

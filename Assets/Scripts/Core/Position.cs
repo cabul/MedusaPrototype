@@ -51,10 +51,9 @@ public sealed class Position
   }
 
   // Calcula la dirección que une a dos posiciones
-  // Dir = Pos - Pos
-  public static Direction operator -(Position a, Position b)
+  public Direction To(Position other)
   {
-    return new Direction(a.x - b.x, a.y - b.y);
+    return new Direction(this.x - other.x, this.y - other.y);
   }
 
   // Comprueba si se encuentra fuera de un layer
@@ -73,9 +72,9 @@ public sealed class Position
 
   // Calcula la distancia entre dos posiciones
   // Distancia = Pos % Pos
-  public static int operator %(Position a, Position b)
+  public int Distance(Position other)
   {
-    return (a - b).len;
+    return this.To(other).length;
   }
 
   public override string ToString()

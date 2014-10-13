@@ -24,7 +24,7 @@ public sealed class Direction
     this.y = y;
   }
 
-  public int len {
+  public int length {
     get { return Math.Abs(x) + Math.Abs(y); }
   }
 

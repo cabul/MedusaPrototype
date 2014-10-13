@@ -40,7 +40,7 @@ public class CompactGenerator : EnvGenerator
         lay.Put(CloneGO(org),pos);
         cnt-=1;
         if(mirror) {
-          lay.Put(CloneGO(org),lay%pos);
+          lay.Put(CloneGO(org),lay.Mirror(pos));
           cnt-=1;
         }
       }

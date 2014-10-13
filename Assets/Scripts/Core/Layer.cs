@@ -130,12 +130,9 @@ public class Layer : MonoBehaviour,IEnumerable
     return this;
   }
   
-  // Este quizas es un poco demasiado
-  // Haze la función de espejo
-  // Por eso %, porque es como un espejo ;)
-  public static Position operator % (Layer lay, Position pos)
+  public Position Mirror(Position pos)
   {
-    return new Position (lay.xs - pos.x - 1, lay.ys - pos.y - 1);
+    return new Position (xs - pos.x - 1, ys - pos.y - 1);
   }
 
   // Para poder recorrer todos los tokens que no sean null
