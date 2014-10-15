@@ -8,55 +8,56 @@ public class MoveSkill : BaseSkill
 {
 
   public int range;
-  public Material highlight;
-  public Material mark;
-  private HashSet<Position> valid;
-  private LinkedList<Position> steps;
+  private HashSet<Position> positionsInRange;
+  private LinkedList<Position> stepList;
+
+  public Material inRangeMaterial;
+  public Material selectedStepMaterial;
+  public Material lastStepMaterial;
 
   public MoveSkill ()
   {
     power = "Move";
-    valid = new HashSet<Position> ();
-    steps = new LinkedList<Position> ();
+    positionsInRange = new HashSet<Position> ();
+    stepList = new LinkedList<Position> ();
   }
 
-  public override void ClickHandler (Token clk)
+  public override void ClickHandler (Token clicked)
   {
-    if (clk == null) {
-      Debug.Log("Nothing clicked");
-      Exit ();
-      return;
-    }
-    if (!valid.Contains (clk.position)) {
-      Debug.Log("Not valid clicked");
+    if (clicked == null) {
       Exit ();
       return;
     }
 
-    if(clk.position == tkn.position) {
-      Debug.Log("Already clicked");
+    if (!positionsInRange.Contains (clicked.position)) {
       Exit ();
       return;
     }
 
-    if(steps.Count == 0) {
-      if(clk.position.Distance(tkn.position) == 1 && steps.Count < range) {
-        steps.AddLast(clk.position);
-        board ["Terrain"] [clk.position].Get<Selectable> ().Select (mark);
+    if(clicked.position == parentToken.position) {
+      Exit ();
+      return;
+    }
+
+    if(stepList.Count == 0) {
+      if( clicked.position.Distance(parentToken.position) == 1 
+      &&  stepList.Count < range) {
+        stepList.AddLast(clicked.position);
+        mark(clicked.position,lastStepMaterial);
       }
       return;
     }
 
-    if(clk.position == steps.Last.Value) {
-      board ["Terrain"] [clk.position].Get<Selectable> ().Unselect();
-      board ["Terrain"] [clk.position].Get<Selectable> ().Select (highlight);
-      steps.RemoveLast();
+    if(clicked.position == stepList.Last.Value) {
+      mark(clicked.position,inRangeMaterial);
+      stepList.RemoveLast();
       return;
     }
 
-    if (clk.position.Distance(steps.Last.Value) == 1 && !steps.Contains (clk.position) && steps.Count < range) {
-      steps.AddLast(clk.position);
-      board ["Terrain"] [clk.position].Get<Selectable> ().Select (mark);
+    if (clicked.position.Distance(stepList.Last.Value) == 1 && !stepList.Contains (clicked.position) && stepList.Count < range) {
+      mark(stepList.Last.Value,selectedStepMaterial);
+      stepList.AddLast(clicked.position);
+      mark(clicked.position,lastStepMaterial);
     }
   }
 
@@ -68,34 +69,27 @@ public class MoveSkill : BaseSkill
 
   public override bool Apply()
   {
-    if(steps.Count == 0) {
+    if(stepList.Count == 0) {
       ClearSelection();
       return false;
     }
-    tkn.layer[tkn.position] = null;
-    tkn.layer[steps.Last.Value] = tkn;
+    parentToken.layer[parentToken.position] = null;
+    parentToken.layer[stepList.Last.Value] = parentToken;
     ClearSelection();
     return true;
   }
 
-  public override void Activate (Board board)
+  public override void Setup ()
   {
-    base.Activate (board);
+    positionsInRange.Clear ();
+    stepList.Clear ();
 
-    valid.Clear ();
-    steps.Clear ();
-
-    SearchWay (valid, board ["Solid"], tkn.position, range);
+    SearchWay (positionsInRange, board ["Solid"], parentToken.position, range);
     
-    valid.Remove(tkn.position);
+    positionsInRange.Remove(parentToken.position);
 
-    Layer terrain = board ["Terrain"];
-
-    foreach (Position position in valid) {
-      Selectable select = terrain [position].Get<Selectable> ();
-      if (select != null) {
-        select.Select (highlight);
-      }
+    foreach (Position position in positionsInRange) {
+      mark(position,inRangeMaterial);
     }
 
   }
@@ -105,30 +99,26 @@ public class MoveSkill : BaseSkill
     ClearSelection();
   }
 
-  public void SearchWay (HashSet<Position> cells, Layer lay, Position init, int max)
+  public void SearchWay (HashSet<Position> inRange, Layer layer, Position startingPosition, int stepCount)
   {
-    if (max-- == 0)
+    if (stepCount-- == 0)
       return;
     Position position;
     foreach (Direction dir in Direction.All) {
-      position = init + dir;
-      if (position.Outside(lay))
+      position = startingPosition + dir;
+      if (position.Outside(layer))
         continue;
-      if (lay [position] == null) {
-        cells.Add (position);
-        SearchWay (cells, lay, position, max);
+      if (layer [position] == null) {
+        inRange.Add (position);
+        SearchWay (inRange, layer, position, stepCount);
       }
     }
   }
 
   private void ClearSelection()
   {
-    Layer terrain = board ["Terrain"];
-    foreach (Position position in valid) {
-      Selectable sable = terrain [position].Get<Selectable> ();
-      if (sable != null) {
-        sable.Unselect ();
-      }
+    foreach (Position position in positionsInRange) {
+      mark(position,null);
     }
   }
 

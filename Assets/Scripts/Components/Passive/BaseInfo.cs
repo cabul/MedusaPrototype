@@ -9,6 +9,13 @@ public abstract class BaseInfo : MonoBehaviour{
     get{ return GetInfo(); }
   }
 
+  protected Token parentToken;
+
+  void Awake()
+  {
+    parentToken = GetComponent<Token>();
+  }
+
   protected abstract string GetInfo();
 
 

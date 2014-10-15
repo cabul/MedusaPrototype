@@ -2,28 +2,25 @@
 using System.Collections;
 using System;
 
+public delegate void CellMarker(Position position, Material material);
+
 public class Director : MonoBehaviour
 {
   private Board board;
   public Token selectedToken;
-  public Material selectMaterial;
   public int seed;
 
-
-  // GUI Stuff
-  public int left = 10;
-  public int top = 10;
-  public int buttonWidth = 50;
-  public int buttonHeight = 50;
-  public int labelWidth = 200;
-  public int labelHeight = 20;
+  private GUIControl gui;
 
   private BaseSkill selectedSkill;
+
+  public Material selectMaterial;
 
   void Awake ()
   {
     UnityEngine.Random.seed = seed;
     board = GameObject.Find ("BoardNode").GetComponent<Board> ();
+    gui = GetComponent<GUIControl>();
   }
 
   void Start ()
@@ -36,8 +33,10 @@ public class Director : MonoBehaviour
 
     // Conectar los eventos
 
-    board.OnClick += Selector;
-    board.OnClick += DebugClick;
+    gui.OnClick += SelectCell;
+    //gui.OnClick += DebugClick;
+
+    gui.OnSkill += SelectSkill;
 
   }
 
@@ -65,43 +64,6 @@ public class Director : MonoBehaviour
     env.Generate (solid);
   }
 
-  // La Interfaz
-  void OnGUI()
-  {
-    if(selectedToken == null) return;
-    board.launchClick = false;
-
-    ShowLabels(selectedToken);
-
-    if( ShowSkills(selectedToken) ) return;
-
-    board.launchClick = true;
-  }
-
-  private void ShowLabels(Token token)
-  {
-    BaseInfo[] infos = token.All<BaseInfo>();
-    for(int i = 0; i < infos.Length; i++) {
-      GUI.Label(new Rect(left,top+(labelHeight+top)*i,labelWidth,labelHeight), infos[i].Content);
-    }
-  }
-
-  // returns true if skill was selected
-  private bool ShowSkills(Token token)
-  {
-    BaseSkill[] skills = selectedToken.All<BaseSkill>();
-    if(skills != null) {
-      for(int i = 0; i < skills.Length; i++) {
-        if(GUI.Button(new Rect(left+((buttonWidth+left)*i),Screen.height - top - buttonHeight,buttonWidth,buttonHeight),skills[i].power)) {
-          SelectSkill(skills[i]);
-          Event.current.Use();
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
   // Seleccionar una habilidad
   private void SelectSkill(BaseSkill skill)
   {
@@ -121,48 +83,44 @@ public class Director : MonoBehaviour
   // A lo mejor crear una clase que se ocupa de ello
   private void SkillStart (BaseSkill skill)
   {
-    Debug.Log("Start skill "+skill.power+ " @ "+Time.time);
-    skill.Activate (board);
+    skill.Activate (board,MarkCell);
     PropagateEvents(skill);
   }
 
   private void SkillStop (BaseSkill skill)
   {
-    Debug.Log("Stop skill "+skill.power+ " @ "+Time.time);
     skill.Cancel();
 
     HandleEvents(skill);
 
     UnselectAll();
-    SelectAt(selectedToken.position);
+    MarkCell(selectedToken.position,selectMaterial);
 
   }
 
   private void SkillConfirm (BaseSkill skill)
   {
-    Debug.Log("Confirm skill "+skill.power+ " @ "+Time.time);
     skill.Apply();
 
     HandleEvents(skill);
 
     UnselectAll();
-    SelectAt(selectedToken.position);
-
+    MarkCell(selectedToken.position,selectMaterial);
   }
 
   private void PropagateEvents(BaseSkill skill)
   {
-    board.OnClick -= Selector;
-    board.OnClick += skill.ClickHandler;
+    gui.OnClick -= SelectCell;
+    gui.OnClick += skill.ClickHandler;
     skill.OnCancel += SkillStop;
     selectedSkill = skill;
   }
 
   private void HandleEvents(BaseSkill skill)
   {
-    board.OnClick -= skill.ClickHandler;
+    gui.OnClick -= skill.ClickHandler;
     skill.OnCancel -= SkillStop;
-    board.OnClick += Selector;
+    gui.OnClick += SelectCell;
     selectedSkill = null;
   }
 
@@ -174,23 +132,16 @@ public class Director : MonoBehaviour
   }
 
   // Seleccionar una celda
-  private void Selector (Token token)
+  private void SelectCell (Token token)
   {
     UnselectAll();
     if (token != null) {
       selectedToken = board["Solid"][token.position];
-      SelectAt(token.position);
+      gui.Render(selectedToken);
+      MarkCell(token.position,selectMaterial);
+    } else {
+      gui.Render(null);
     }
-  }
-
-  private void UnselectAt(Position position)
-  {
-    board["Terrain"][position].Get<Selectable>().Unselect();
-  }
-
-  private void SelectAt(Position position)
-  {
-    board["Terrain"][position].Get<Selectable>().Select (selectMaterial);
   }
 
   private void DebugClick (Token token)
@@ -204,6 +155,15 @@ public class Director : MonoBehaviour
         arr [i] = (tokens [i] == null) ? "ø" : tokens [i].gameObject.name;
       }
       Debug.Log ("Hit @ " + token.position + ": [ " + string.Join (", ", arr) + " ]");
+    }
+  }
+
+  public void MarkCell(Position position, Material material)
+  {
+    if (material == null) {
+      board["Terrain"][position].Get<Selectable>().Unselect();
+    } else {
+      board["Terrain"][position].Get<Selectable>().Select(material);
     }
   }
 

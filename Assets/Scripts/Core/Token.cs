@@ -44,4 +44,10 @@ public class Token : MonoBehaviour
     return transform.name;
   }
 
+  public void Destroy()
+  {
+    layer[position] = null;
+    Destroy(gameObject);
+  }
+
 }
