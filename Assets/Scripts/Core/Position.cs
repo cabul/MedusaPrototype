@@ -45,9 +45,9 @@ public sealed class Position
 
   // Mueve una Posición según una Dirección
   // Pos = Pos + Dir
-  public static Position operator +(Position p, Direction d)
+  public static Position operator +(Position position, Direction direction)
   {
-    return new Position(p.x + d.x, p.y + d.y);
+    return new Position(position.x + direction.x, position.y + direction.y);
   }
 
   // Calcula la dirección que une a dos posiciones
@@ -57,21 +57,18 @@ public sealed class Position
   }
 
   // Comprueba si se encuentra fuera de un layer
-  // Fuera = Pos > Lay
-  public bool Outside(Layer lay)
+  public bool Outside(Layer layer)
   {
-    return lay.Outside(this);
+    return layer.Outside(this);
   }
 
   // Comprueba si se encuentra dentro de un layer
-  // Dentro = Pos < Lay
-  public bool Inside(Layer lay)
+  public bool Inside(Layer layer)
   {
-    return lay.Inside(this);
+    return layer.Inside(this);
   }
 
   // Calcula la distancia entre dos posiciones
-  // Distancia = Pos % Pos
   public int Distance(Position other)
   {
     return this.To(other).length;

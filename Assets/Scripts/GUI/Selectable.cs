@@ -5,25 +5,25 @@ using System.Collections;
 public class Selectable : MonoBehaviour
 {
 
-  private Material normal;
+  private Material normalMaterial;
   private Renderer ren;
 
   void Start()
   {
     ren = transform.GetChild(0).renderer;
-    normal = ren.material;
+    normalMaterial = ren.material;
   }
 
-  public Material Select(Material select)
+  public Material Select(Material selectMaterial)
   {
-    ren.material = select;
-    return normal;
+    ren.material = selectMaterial;
+    return normalMaterial;
   }
 
   public Material Unselect()
   {
     Material old = ren.material;
-    ren.material = normal;
+    ren.material = normalMaterial;
     return old;
   }
 

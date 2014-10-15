@@ -8,17 +8,17 @@ public class CameraControl : MonoBehaviour
   private float minFOV = 2;
   private float maxFOV = 8;
   private float distance = 50;
-  private float zoomSens = 4;
+  private float zoomSensitivity = 4;
   private float zoomInertia = 4;
   private Vector3 mousePosition;
   private bool isRotating = false;
   private float rotation = 45;
-  private float rotSens = 0.1f;
+  private float rotSensitivity = 0.1f;
   private float rotInertia = 2;
   private float rotDelta;
 
-  private float keyDx;
-  private float keySens = 2;
+  private float keyDeltaX;
+  private float keySensitivity = 2;
 
   public bool doRotate;
   public bool doZoom;
@@ -26,9 +26,9 @@ public class CameraControl : MonoBehaviour
   void Start ()
   {
     Board board = GameObject.Find ("BoardNode").GetComponent<Board> ();
-    transform.position = new Vector3 ((float)board.xs / 2
+    transform.position = new Vector3 ((float)board.width / 2
                                     , -0.75f
-                                    , (float)board.ys / 2);
+                                    , (float)board.height / 2);
     cam = Camera.main;
 
     distance = cam.orthographicSize;
@@ -44,7 +44,7 @@ public class CameraControl : MonoBehaviour
 
   void ZoomCamera ()
   {
-    distance -= Input.GetAxis ("Mouse ScrollWheel") * zoomSens;
+    distance -= Input.GetAxis ("Mouse ScrollWheel") * zoomSensitivity;
     distance = Mathf.Clamp (distance, minFOV, maxFOV);
     cam.orthographicSize = Mathf.Lerp (cam.orthographicSize, distance, Time.deltaTime * zoomInertia);
   }
@@ -63,27 +63,27 @@ public class CameraControl : MonoBehaviour
     float dx;
 
     if (isRotating) {
-      dx = (Input.mousePosition.x - mousePosition.x) * rotSens;
+      dx = (Input.mousePosition.x - mousePosition.x) * rotSensitivity;
       mousePosition = Input.mousePosition;
     } else {
       dx = - rotDelta;
     }
 
     if(Input.GetKeyDown(KeyCode.LeftArrow)) {
-      keyDx = -1;
+      keyDeltaX = -1;
     }
     if(Input.GetKeyDown(KeyCode.RightArrow)) {
-      keyDx = 1;
+      keyDeltaX = 1;
     }
 
     if(Input.GetKeyUp(KeyCode.LeftArrow)) {
-      keyDx = 0;
+      keyDeltaX = 0;
     }
     if(Input.GetKeyUp(KeyCode.RightArrow)) {
-      keyDx = 0;
+      keyDeltaX = 0;
     }
 
-    dx += keyDx * keySens;
+    dx += keyDeltaX * keySensitivity;
 
 
     rotDelta = Mathf.Lerp(rotDelta,rotDelta+dx,Time.deltaTime *rotInertia);

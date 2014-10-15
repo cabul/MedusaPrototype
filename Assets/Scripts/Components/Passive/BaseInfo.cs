@@ -5,8 +5,15 @@ using System.Collections;
 
 public abstract class BaseInfo : MonoBehaviour{
 
-	public string info{
+	public string Content{
     get{ return GetInfo(); }
+  }
+
+  protected Token parentToken;
+
+  void Awake()
+  {
+    parentToken = GetComponent<Token>();
   }
 
   protected abstract string GetInfo();

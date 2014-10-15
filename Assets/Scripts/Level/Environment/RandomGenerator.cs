@@ -6,49 +6,49 @@ public class RandomGenerator : EnvGenerator
   public int treeCount;
   public int stoneCount;
   public int dollCount;
-  private GameObject tree;
-  private GameObject stone;
-  private GameObject doll;
+  private GameObject treePrefab;
+  private GameObject stonePrefab;
+  private GameObject dollPrefab;
 
   void Awake ()
   {
-    tree = Resources.Load<GameObject> ("Tokens/Environment/Tree");
-    stone = Resources.Load<GameObject> ("Tokens/Environment/Stone");
-    doll = Resources.Load<GameObject> ("Tokens/Character/Doll");
+    treePrefab = Resources.Load<GameObject> ("Tokens/Environment/Tree");
+    stonePrefab = Resources.Load<GameObject> ("Tokens/Environment/Stone");
+    dollPrefab = Resources.Load<GameObject> ("Tokens/Character/Doll");
   }
 
-  public override void Generate(Layer lay)
+  public override void Generate(Layer layer)
   {
-    SetRandom(tree,lay,treeCount);
-    SetRandom(stone,lay,stoneCount);
-    SetRandom(doll,lay,dollCount);
+    SetRandom(treePrefab,layer,treeCount);
+    SetRandom(stonePrefab,layer,stoneCount);
+    SetRandom(dollPrefab,layer,dollCount);
   }
 
-  private void SetRandom(GameObject org,Layer lay,int cnt)
+  private void SetRandom(GameObject prefab,Layer layer,int count)
   {
-    int xMax = (mirror)?(lay.xs+1)/2:lay.xs;
-    int yMax = lay.ys;
+    int xMax = (mirror)?(layer.width+1)/2:layer.width;
+    int yMax = layer.height;
 
-    Position pos;
+    Position position;
 
-    while(cnt > 0) {
-      pos = RandomPosition(xMax,yMax);
-      if(lay[pos] == null) {
-        lay.Put(CloneGO(org),pos);
-        cnt-=1;
+    while(count > 0) {
+      position = RandomPosition(xMax,yMax);
+      if(layer[position] == null) {
+        layer.Put(CloneGO(prefab),position);
+        count-=1;
         if(mirror) {
-          lay.Put(CloneGO(org),lay.Mirror(pos));
-          cnt-=1;
+          layer.Put(CloneGO(prefab),layer.Mirror(position));
+          count-=1;
         }
       }
     }
 
   }
 
-  private GameObject CloneGO(GameObject org)
+  private GameObject CloneGO(GameObject prefab)
   {
-    GameObject go = (GameObject)Instantiate(org);
-    go.name = org.name;
+    GameObject go = (GameObject)Instantiate(prefab);
+    go.name = prefab.name;
     return go;
   }
 

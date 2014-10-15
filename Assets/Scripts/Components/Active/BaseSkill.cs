@@ -12,14 +12,15 @@ public abstract class BaseSkill : MonoBehaviour
   public event OnSkillCancel OnCancel;
 
   protected Board board;
-  public Token tkn;
+  protected CellMarker mark;
+  public Token parentToken;
   public string power;
 
   public abstract void ClickHandler (Token clk);
 
   void Awake ()
   {
-    tkn = GetComponent<Token> ();
+    parentToken = GetComponent<Token> ();
   }
 
   // Cuando se termina de ejecutar
@@ -29,9 +30,16 @@ public abstract class BaseSkill : MonoBehaviour
   }
 
   // Cuando se selecciona
-  public virtual void Activate (Board board)
+  public void Activate (Board board, CellMarker mark)
   {
     this.board = board;
+    this.mark = mark;
+    Setup();
+  }
+
+  public virtual void Setup()
+  {
+
   }
 
   // Cuand se cancela

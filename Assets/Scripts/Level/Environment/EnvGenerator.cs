@@ -3,17 +3,17 @@ using System.Collections;
 
 public abstract class EnvGenerator : MonoBehaviour {
 
-  public abstract void Generate(Layer lay);
+  public abstract void Generate(Layer layer);
 
   public bool mirror;
 
-  public GameObject MirrorObject (Position pos, Layer lay)
+  public GameObject MirrorObject (Position position, Layer layer)
   {
-    Token tkn = lay [lay.Mirror(pos)];
-    if (tkn == null)
+    Token token = layer [layer.Mirror(position)];
+    if (token == null)
       return (GameObject)null;
-    GameObject go = (GameObject)Instantiate (tkn.gameObject);
-    go.name = tkn.gameObject.name;
+    GameObject go = (GameObject)Instantiate (token.gameObject);
+    go.name = token.gameObject.name;
     return go;
   }
 

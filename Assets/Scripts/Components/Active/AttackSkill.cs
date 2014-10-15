@@ -7,61 +7,55 @@ public class AttackSkill : BaseSkill {
 
   public int dmg;
 
-  public Material valid;
-  public Material highlight;
-  public Material mark;
-
   private Token target;
+
+  public Material inRangeMaterial;
+  public Material validTargetMaterial;
+  public Material selectedTargetMaterial;
+
+  public int range;
 
 	public AttackSkill()
   {
     power = "Attack";    
   }
 
-  public override void ClickHandler (Token clk)
+  public override void ClickHandler (Token clicked)
   {
-    if(clk == null) {
+    if(clicked == null) {
       ClearSelection();
       Exit();
       return;
     }
-    if(clk.pos.Distance(tkn.pos) != 1) {
+    if(clicked.position.Distance(parentToken.position) != range) {
       ClearSelection();
       Exit();
       return;
     }
     Layer solid = board["Solid"];
-    Token obj = solid[clk.pos];
-    
-    Layer terrain = board["Terrain"];
+    Token token = solid[clicked.position];
 
-    if (obj != target) {
-      target = null;
-      terrain[clk.pos].Get<Selectable>().Unselect();
-    }
-
-    if(ValidTarget(obj)) {
-      target = obj;
-      terrain[clk.pos].Get<Selectable>().Select(mark); 
+    if(ValidTarget(target)) {
+      if(target != null) mark(target.position,validTargetMaterial);
     } else {
-      terrain[clk.pos].Get<Selectable>().Select((ValidTarget(solid[clk.pos]))?valid:highlight); 
+      if(target != null) mark(target.position,inRangeMaterial);
     }
+
+    if(ValidTarget(token)) {
+      target = token;
+      mark(token.position,selectedTargetMaterial);
+    } 
   }
 
-
-  public override void Activate (Board board)
+  public override void Setup ()
   {
-    base.Activate (board);
 
     Layer terrain = board["Terrain"];
 
-    Layer solid = board["Solid"];
-
-    foreach ( Direction dir in Direction.All ) {
-      Position pos = tkn.pos + dir;
-      if( pos.Inside(terrain) ) {
-        Selectable cell = terrain[pos].Get<Selectable>();
-        cell.Select(ValidTarget(solid[pos])?valid:highlight);
+    foreach ( Direction direction in Direction.All ) {
+      Position position = parentToken.position + direction;
+      if( position.Inside(terrain) ) {
+        SelectCell( position );
       }
     }
   }
@@ -79,15 +73,15 @@ public class AttackSkill : BaseSkill {
     ClearSelection();
   }
 
-  public bool ValidTarget(Token obj) 
+  public bool ValidTarget(Token token) 
   {
-    if(obj == null) {
+    if(token == null) {
       return false;
     }
-    if(!obj.Has<LifeInfo>()) {
+    if(!token.Has<LifeInfo>()) {
       return false;
     }
-    if(obj.Get<LifeInfo>().isDead) {
+    if(token.Get<LifeInfo>().isDead) {
       return false;
     }
     return true;
@@ -96,13 +90,24 @@ public class AttackSkill : BaseSkill {
   private void ClearSelection()
   {
     Layer terrain = board["Terrain"];
-    foreach(Direction dir in Direction.All ) {
-      Position pos = tkn.pos + dir;
-      if(pos.Inside(terrain)) {
-        terrain[pos].Get<Selectable>().Unselect();
+    foreach(Direction direction in Direction.All ) {
+      Position position = parentToken.position + direction;
+      if(position.Inside(terrain)) {
+        mark(position,null);
       }
     }
   }
 
+  private void SelectCell(Position position)
+  {
+    Token token = board["Solid"][position];
+    if ( ValidTarget(token)) {
+      mark(position, validTargetMaterial );
+    } else {
+      mark(position, inRangeMaterial );
+    }
+
+    
+  }
 
 }
